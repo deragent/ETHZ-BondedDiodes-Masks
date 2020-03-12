@@ -4,6 +4,8 @@ from .. import Element
 
 class Mask(Element):
 
+    T_HEIGHT = 2000
+
     def __init__(self, parent, name, size, text, margin=4000, layers=None, lib=None):
 
         self.size = size
@@ -54,39 +56,32 @@ class Mask(Element):
 
         text = self.lib.new_cell(self.name + '_LABEL')
 
-        maxlabel = 0
-        y = y0
-
-        for label, value in self.text.items():
-            t = gdspy.Text(label, T_HEIGHT, position=(x0, y), **self.layers["MASK_LABEL"])
-            text.add(t)
-
-            bbox = t.get_bounding_box()
-            length = bbox[1,0] - bbox[0,0]
-            if length > maxlabel: maxlabel = length
-
-            y += T_HEIGHT*1.3
-
-        maxvalue = 0
-        y = y0
-
-        for label, value in self.text.items():
-            t = gdspy.Text(value, T_HEIGHT, position=(x0 + maxlabel*1.3, y), **self.layers["MASK_LABEL"])
-            text.add(t)
-
-            bbox = t.get_bounding_box()
-            length = bbox[1,0] - bbox[0,0]
-            if length > maxvalue: maxvalue = length
-
-            y += T_HEIGHT*1.3
+        maxlabel = self._constructTextList(text, self.text.keys(), x0, y0)
+        maxvalue = self._constructTextList(text, self.text.values(), x0 + maxlabel*1.3, y0)
 
         rect = gdspy.Rectangle(
             (x0 - T_HEIGHT, y0 - T_HEIGHT),
-            (x0 + maxlabel*1.3 + maxvalue + T_HEIGHT, y0 + len(self.text)*T_HEIGHT*1.3 + T_HEIGHT),
+            (x0 + maxlabel*1.3 + maxvalue + T_HEIGHT, y0 + len(self.text)*self.T_HEIGHT*1.3 + self.T_HEIGHT),
             **self.layers["MASK_LABEL"]
         )
-        outset = gdspy.offset(rect, T_HEIGHT/2)
+        outset = gdspy.offset(rect, self.T_HEIGHT/2)
 
         text.add(gdspy.boolean(outset, rect, 'not', **self.layers["MASK_LABEL"]))
 
         self.cell.add(text)
+
+    def _constructTextList(self, cell, values, x, y):
+
+        maxlength = 0
+
+        for value in values:
+            t = gdspy.Text(value, self.T_HEIGHT, position=(x, y), **self.layers["MASK_LABEL"])
+            cell.add(t)
+
+            bbox = t.get_bounding_box()
+            length = bbox[1,0] - bbox[0,0]
+            if length > maxlength: maxlength = length
+
+            y += self.T_HEIGHT*1.3
+
+        return maxlength
