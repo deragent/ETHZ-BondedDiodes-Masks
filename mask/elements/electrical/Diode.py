@@ -1,14 +1,12 @@
 import gdspy
 
-from ...config import GLOBAL_LAYERS
+from .. import Element
+
 from ...forms import GuardRings
 
-class Diode():
+class Diode(Element):
 
-    def __init__(self, lib, name, size, overhang=10, layers=GLOBAL_LAYERS):
-
-        self.cell = lib.new_cell(name)
-        self.layers = layers
+    def __init__(self, parent, name, size, overhang=10, layers=None, lib=None):
 
         try:
             self.A = size[0]
@@ -17,7 +15,12 @@ class Diode():
             self.A = size
             self.B = size
 
-        self.__createDiode(self.layers["CONTACT_DOPING"], overhang = overhang)
+        self.overhang = overhang
+
+        super().__init__(parent, name, layers, lib)
+
+    def construct(self):
+        self.__createDiode(self.layers["CONTACT_DOPING"], overhang = self.overhang)
         self.__createDiode(self.layers["METALIZATION"], overhang = 0)
 
     def __createDiode(self, layer, overhang = 0):

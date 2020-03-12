@@ -1,17 +1,17 @@
 import gdspy
 
-from ...config import GLOBAL_LAYERS
-from ...forms import GuardRings
+from .. import Element
 
-class Wafer():
+class Wafer(Element):
 
-    def __init__(self, lib, name, size, margin=5000, layers=GLOBAL_LAYERS):
-
-        self.cell = lib.new_cell(name)
-        self.layers = layers
+    def __init__(self, parent, name, size, margin=5000, layers=None, lib=None):
 
         self.size = size
         self.margin = margin
+        
+        super().__init__(parent, name, layers, lib)
+
+    def construct(self):
 
         flat_cut = 8000
 
@@ -20,7 +20,7 @@ class Wafer():
 
         outline = gdspy.boolean(round, flat, 'not', **self.layers["WAFER_OUTLINE"])
 
-        margin = gdspy.offset(outline, -margin, tolerance=100)
+        margin = gdspy.offset(outline, -self.margin, tolerance=100)
 
         wafer = gdspy.boolean(outline, margin, 'not', **self.layers["WAFER_OUTLINE"])
 
