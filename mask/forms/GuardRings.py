@@ -21,7 +21,7 @@ class GuardRings():
         offset1 = gdspy.offset(self.base, offset + spec[0], join='round', tolerance=self.tolerance)
         offset2 = gdspy.offset(self.base, offset + spec[0] + spec[1], join='round', tolerance=self.tolerance)
 
-        diff = gdspy.boolean(offset2, offset1, 'not', layer=self.layer)
+        diff = gdspy.boolean(offset2, offset1, 'not', **self.layer)
         self.cell.add(diff)
 
         return spec[0] + spec[1]
