@@ -32,5 +32,4 @@ class Element():
         self.height = bbox[1,1] - bbox[0,1]
 
         if self.parent is not None:
-            print(self.parent.name)
             self.parent.add(self.cell)
