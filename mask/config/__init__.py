@@ -1,3 +1,8 @@
+import gdspy
+
 from .Layers import LayerSpecs
 
-GLOBAL_LAYERS = LayerSpecs()
+GLOBAL = {
+    "LAYERS": LayerSpecs(),
+    "LIB": gdspy.GdsLibrary(),
+}
