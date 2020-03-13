@@ -28,11 +28,11 @@ d8 = Diode(None, 'DIODE_8mm', 8000)
 d5 = Diode(None, 'DIODE_5mm', 5000)
 d2 = Diode(None, 'DIODE_2mm', 2000)
 
-spacing = 1500
+spacing = 1000
 
 offset = spacing/2
 
-ystart = [-52000, -53500, -48000, -41000, -35000]
+ystart = [-52000, -53500, -50000, -45000, -41000]
 
 for ii, d in enumerate([d15, d12, d8, d5, d2]):
 
@@ -41,7 +41,7 @@ for ii, d in enumerate([d15, d12, d8, d5, d2]):
     xstart = offset + d.width/2
 
     n = math.ceil(-2*ystart[ii] / yspacing)
-    if ii == 1:
+    if ii <= 1:
         n -= 1
 
     top.add(gdspy.CellArray(d.cell, 1, n, (0, yspacing), origin=(xstart, ystart[ii])))
