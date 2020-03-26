@@ -2,8 +2,6 @@ import gdspy
 
 from .. import Element
 
-from ...forms import GuardRings
-
 class Resistance(Element):
 
     WIDTH = 1000
