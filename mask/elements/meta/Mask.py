@@ -6,11 +6,16 @@ class Mask(Element):
 
     T_HEIGHT = 2000
 
-    def __init__(self, parent, name, size, text, margin=4000, layers=None, lib=None):
+    def __init__(self, parent, name, size, text, margin=4000, layers=None, lib=None, githash=False):
 
         self.size = size
         self.margin = margin
         self.text = text
+
+        if githash:
+            import git
+            repo = git.Repo(search_parent_directories=True)
+            self.text['git'] = repo.head.object.hexsha[0:8]
 
         super().__init__(parent, name, layers, lib)
 
@@ -51,8 +56,8 @@ class Mask(Element):
     def _constructLabel(self):
         T_HEIGHT = 2000
 
-        x0 = -self.size/2 + 3*self.margin
-        y0 = -self.size/2 + 3*self.margin
+        x0 = -self.size/2 + 2.5*self.margin
+        y0 = -self.size/2 + 2.5*self.margin
 
         text = self.lib.new_cell(self.name + '_LABEL')
 
