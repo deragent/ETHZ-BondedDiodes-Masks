@@ -20,10 +20,10 @@ top = lib.new_cell('TOP_CELL')
 
 w = Wafer(top, 'WAFER', 150000)
 m = Mask(top, 'MASK', 7*25400, {
-    "DATE": "2020-03-12",
-    "USER": "jorich",
-    "LAYOUT": "DIODE-RUN-1"
-})
+        "DATE": "2020-03-12",
+        "USER": "jorich",
+        "LAYOUT": "DIODE-RUN-1"
+    }, githash=True)
 
 
 ### Create diode cells
