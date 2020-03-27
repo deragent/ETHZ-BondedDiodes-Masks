@@ -9,12 +9,15 @@ from mask.processes import BRNC_202003
 from mask.elements.electrical import Diode
 from mask.elements.meta import Wafer
 from mask.elements.meta import Mask
-from mask.elements.test import Resistance
+from mask.elements.test import Resistance, VanDerPauwMetal
+from mask.elements.fabrication import MarkerCoarse
 
-lib = gdspy.GdsLibrary()
+lib = gdspy.GdsLibrary()#infile='Nanoscribe_Wafer_25mmx25mm_WithMarkers2.gds')
 config.GLOBAL["LIB"] = lib
 
 top = lib.new_cell('TOP_CELL')
+
+#top.add(lib.cells['noname'])
 
 ### Create meta cells
 
@@ -51,14 +54,24 @@ for ii, d in enumerate([d15, d12, d8, d6, d4, d2]):
     if ii <= 2:
         n -= 1
 
+    if ii == 2:
+        n2 = math.ceil(-1*ystart[ii] / yspacing)
+
+        yoffset = ystart[ii]+(n2+1)*yspacing
+
+        top.add(gdspy.CellArray(d.cell, 1, n - n2 -1, (0, yspacing), origin=(xstart, yoffset)))
+        top.add(gdspy.CellArray(d.cell, 1, n - n2 -1, (0, yspacing), origin=(-xstart, yoffset)))
+
+        n = n2
+
     top.add(gdspy.CellArray(d.cell, 1, n, (0, yspacing), origin=(xstart, ystart[ii])))
     top.add(gdspy.CellArray(d.cell, 1, n, (0, yspacing), origin=(-xstart, ystart[ii])))
 
     offset += d.width + spacing
 
 
-### Add test structures
-testres = lib.new_cell('TEST_TOP')
+### Add resistive test structures
+testres = lib.new_cell('TEST_RES')
 
 r5 = Resistance(None, 'RES_5mm', 5000)
 r10 = Resistance(None, 'RES_10mm', 10000)
@@ -81,14 +94,22 @@ testres.add(gdspy.CellReference(r5.cell, origin=(-1.1*r5.width, 4.5*r15.height))
 testres.add(gdspy.CellReference(r5.cell, origin=(0*r5.width, 4.5*r15.height)))
 testres.add(gdspy.CellReference(r5.cell, origin=(+1.1*r5.width, 4.5*r15.height)))
 
-
-
 top.add(gdspy.CellReference(testres, rotation=90, origin=(-62000, 0)))
 top.add(gdspy.CellReference(testres, rotation=-90, origin=(+62000, 0)))
+top.add(gdspy.CellReference(testres, rotation=0, origin=(0, +62000)))
+
+
+### Add VDP test structures
+# vdp = VanDerPauwMetal(top, 'VDP_3mm', 1500)
+
+
+
+### Add Markers
+top.add(BRNC_202003.createMarkers(lib))
 
 
 ### Save the gds file
 
 lib.write_gds('BRNC_Run1_202003.gds')
 
-gdspy.LayoutViewer(lib)
+# gdspy.LayoutViewer(lib)
