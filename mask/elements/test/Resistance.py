@@ -30,6 +30,12 @@ class Resistance(Element):
         contact1 = gdspy.Rectangle((-l2 - mw, -w2), (-l2, w2), **self.layers["METALIZATION"])
         contact2 = gdspy.Rectangle((l2, -w2), (l2 + mw, w2), **self.layers["METALIZATION"])
 
+        open1a = gdspy.Rectangle((-l2 - mw + oh, -w2 + oh), (-l2 - oh, w2 - oh), **self.layers["PASSIVATION_OPEN"])
+        open1b = gdspy.Rectangle((l2 + oh, -w2 + oh), (l2 + mw - oh, w2 - oh), **self.layers["PASSIVATION_OPEN"])
+
         self.cell.add(implant)
         self.cell.add(contact1)
         self.cell.add(contact2)
+
+        self.cell.add(open1a)
+        self.cell.add(open1b)
