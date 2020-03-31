@@ -10,7 +10,7 @@ from mask.elements.electrical import Diode
 from mask.elements.meta import Wafer
 from mask.elements.meta import Mask
 from mask.elements.test import Resistance, VanDerPauwMetal
-from mask.elements.fabrication import MarkerCoarse
+from mask.elements.fabrication import MarkerCoarse, DeviceColumn
 
 lib = gdspy.GdsLibrary()#infile='Nanoscribe_Wafer_25mmx25mm_WithMarkers2.gds')
 config.GLOBAL["LIB"] = lib
@@ -29,7 +29,14 @@ m = Mask(top, 'MASK', 7*25400, {
     }, githash=True)
 
 
+### Add Markers
+markers, keepouts = BRNC_202003.createMarkers(lib)
+top.add(markers)
+
+
+
 ### Create diode cells
+diodes = lib.new_cell('DIODES')
 
 d15 = Diode(None, 'DIODE_15mm', 15000)
 d12 = Diode(None, 'DIODE_12mm', 12000)
@@ -38,36 +45,30 @@ d6 = Diode(None, 'DIODE_6mm', 6000)
 d4 = Diode(None, 'DIODE_4mm', 4000)
 d2 = Diode(None, 'DIODE_2mm', 2000)
 
-spacing = 300
+margin = 150
+dicingwidth = 100
 
-offset = spacing/2
+xoffset = margin
 
-ystart = [-53500, -55000, -53000, -47500, -43500, -39500]
+ymin = [-61500, -61500, -57000, -51000, -45000, -40500]
+ymax = 50300
 
 for ii, d in enumerate([d15, d12, d8, d6, d4, d2]):
 
-    yspacing = d.height + spacing
+    x = xoffset + d.width/2
 
-    xstart = offset + d.width/2
+    column_r = DeviceColumn(diodes, 'COLUMN_R_%s'%(d.name), d.cell,
+        x, ymin[ii], min(-1*ymin[ii], ymax),
+        margin=margin, dicingwidth=100, keepout=keepouts)
 
-    n = math.ceil(-2*ystart[ii] / yspacing)
-    if ii <= 2:
-        n -= 1
+    column_l = DeviceColumn(diodes, 'COLUMN_L_%s'%(d.name), d.cell,
+        -1*x, ymin[ii], min(-1*ymin[ii], ymax),
+        margin=margin, dicingwidth=100, keepout=keepouts)
 
-    if ii == 2:
-        n2 = math.floor(-1*ystart[ii] / yspacing)
+    xoffset += d.width + 2*margin
 
-        yoffset = ystart[ii]+(n2+2)*yspacing
+top.add(diodes)
 
-        top.add(gdspy.CellArray(d.cell, 1, n - n2 -2, (0, yspacing), origin=(xstart, yoffset)))
-        top.add(gdspy.CellArray(d.cell, 1, n - n2 -2, (0, yspacing), origin=(-xstart, yoffset)))
-
-        n = n2
-
-    top.add(gdspy.CellArray(d.cell, 1, n, (0, yspacing), origin=(xstart, ystart[ii])))
-    top.add(gdspy.CellArray(d.cell, 1, n, (0, yspacing), origin=(-xstart, ystart[ii])))
-
-    offset += d.width + spacing
 
 
 ### Add resistive test structures
@@ -101,11 +102,6 @@ top.add(gdspy.CellReference(testres, rotation=0, origin=(0, +62000)))
 
 ### Add VDP test structures
 # vdp = VanDerPauwMetal(top, 'VDP_3mm', 1500)
-
-
-
-### Add Markers
-top.add(BRNC_202003.createMarkers(lib))
 
 
 ### Save the gds file
