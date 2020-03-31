@@ -1,4 +1,5 @@
 import gdspy
+import math
 
 from .. import config
 
@@ -15,7 +16,6 @@ config.GLOBAL["LAYERS"]["CONTACT_DOPING"] = (12, 0)
 config.GLOBAL["LAYERS"]["METALIZATION"] = (13, 0)
 config.GLOBAL["LAYERS"]["PASSIVATION_OPEN"] = (14, 0)
 
-
 config.GLOBAL["LAYERS"]["MASK_LABEL"] =(62, 3)
 
 
@@ -30,6 +30,6 @@ def createMarkers(lib):
     ])
 
     markers.add(gdspy.CellReference(field.cell, origin=(-35000, 0)))
-    markers.add(gdspy.CellReference(field.cell, origin=(+35000, 0)))
+    markers.add(gdspy.CellReference(field.cell, origin=(+35000, 0), x_reflection=True, rotation=180))
 
     return markers
