@@ -9,6 +9,8 @@ from ..elements.fabrication import MarkerField
 
 config.GLOBAL["LAYERS"]["WAFER_OUTLINE"] = (52, 1)
 
+config.GLOBAL["LAYERS"]["DICING"] = (53, 4)
+
 config.GLOBAL["LAYERS"]["MASK_OUTLINE"] = (61, 2)
 
 config.GLOBAL["LAYERS"]["ALIGNMENT_MARKS"] = (11, 0)
