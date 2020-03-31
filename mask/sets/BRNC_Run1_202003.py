@@ -11,6 +11,7 @@ from mask.elements.meta import Wafer
 from mask.elements.meta import Mask
 from mask.elements.test import Resistance, VanDerPauwMetal
 from mask.elements.fabrication import MarkerCoarse, DeviceColumn
+from mask.forms import DicingLine
 
 lib = gdspy.GdsLibrary()#infile='Nanoscribe_Wafer_25mmx25mm_WithMarkers2.gds')
 config.GLOBAL["LIB"] = lib
@@ -59,13 +60,16 @@ for ii, d in enumerate([d15, d12, d8, d6, d4, d2]):
 
     column_r = DeviceColumn(diodes, 'COLUMN_R_%s'%(d.name), d.cell,
         x, ymin[ii], min(-1*ymin[ii], ymax),
-        margin=margin, dicingwidth=100, keepout=keepouts)
+        margin=margin, dicingwidth=dicingwidth, keepout=keepouts)
 
     column_l = DeviceColumn(diodes, 'COLUMN_L_%s'%(d.name), d.cell,
         -1*x, ymin[ii], min(-1*ymin[ii], ymax),
-        margin=margin, dicingwidth=100, keepout=keepouts)
+        margin=margin, dicingwidth=dicingwidth, keepout=keepouts)
 
     xoffset += d.width + 2*margin
+
+top_dicing = DicingLine(config.GLOBAL["LAYERS"]["DICING"], diodes,
+    dicingwidth, (-49000, 50000), (49000, 50000))
 
 top.add(diodes)
 
