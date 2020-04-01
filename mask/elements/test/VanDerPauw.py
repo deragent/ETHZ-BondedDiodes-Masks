@@ -2,6 +2,7 @@ import gdspy
 import math
 
 from ...forms import VanDerPauwClover
+from ...forms import Cross
 
 from .. import Element
 
@@ -46,9 +47,44 @@ class VanDerPauwMetal(Element):
 
 class VanDerPauwContact(Element):
 
-    def __init__(self, parent, name, layers=None, lib=None):
+    def __init__(
+        self, parent, name,
+        contactw=1000, contactspacing=2540,
+        layers=None, lib=None
+    ):
+
+        self.contactspacing = contactspacing
+        self.contactw = contactw
 
         super().__init__(parent, name, layers, lib)
 
     def construct(self):
-        pass
+
+        s = self.contactspacing + self.contactw
+
+        cross = Cross(
+            self.layers["CONTACT_DOPING"], self.cell,
+            s, s/10
+        )
+
+        w2 = self.contactw/2
+        for h in [-1, +1]:
+            x = h * self.contactspacing/2
+            for v in [-1, +1]:
+                y = v * self.contactspacing/2
+
+                ## TODO make offset customizable
+                o = 10
+
+                contact = gdspy.Rectangle((-w2-o, -w2-o), (w2+o, +w2+o))
+                arm = gdspy.FlexPath([(0,0), (-0.55*self.contactspacing, 0)], 2*w2/5).translate(0, 3*w2/5)
+
+                contact = gdspy.boolean(contact, arm, 'or', **self.layers["METALIZATION"])
+                contact = contact.rotate(math.pi/2*((x != y) + (y < 0)*2))
+
+                self.cell.add(contact.translate(x, y))
+
+                self.cell.add(gdspy.Rectangle(
+                    (-w2, -w2), (w2, w2),
+                    **self.layers["PASSIVATION_OPEN"]
+                ).translate(x, y))
