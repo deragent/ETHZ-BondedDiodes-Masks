@@ -7,3 +7,5 @@ from .Arrow import MarkerArrow
 from .DicingLine import DicingLine
 
 from .Cross import Cross
+
+from .TextList import TextList
