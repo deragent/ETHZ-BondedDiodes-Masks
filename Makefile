@@ -15,4 +15,5 @@ show: ${GDS_FILE}.gds
 
 export: ${GDS_FILE}.gds
 	mkdir -p ${DIR}export
-	## TODO
+	rm ${DIR}export/* -f
+	python3 -m mask.sets.${PROJECT} --output ${GDS_FILE}.gds --export ${DIR}export
