@@ -2,8 +2,13 @@ import gdspy
 import math
 import argparse
 
+## Disable the default lib to make multi lib use possible
+gdspy.library.use_current_library = False
+
 from mask import config
 from mask.processes import BRNC_202003
+
+from mask.tools import MaskMerge
 
 from mask.elements.electrical import Diode
 from mask.elements.meta import Wafer
@@ -11,11 +16,14 @@ from mask.elements.meta import Mask
 from mask.elements.test import Resistance, VanDerPauwMetal, VanDerPauwContact
 from mask.elements.fabrication import MarkerCoarse, DeviceColumn
 from mask.forms import DicingLine
+from mask.forms import TextList
 
 
 parser = argparse.ArgumentParser(description='Create the mask layout for the BRNC Run-1 [202003].')
 parser.add_argument('-o', '--output', required=True,
                     help='Name of the output file.')
+parser.add_argument('-e', '--export', default=None,
+                    help='Flag to export the fabrication mask layers into individual files.')
 
 args = parser.parse_args()
 
@@ -28,8 +36,8 @@ top = lib.new_cell('TOP_CELL')
 
 
 ### Create meta cells
-w = Wafer(top, 'WAFER', 150000)
-m = Mask(top, 'MASK', 7*25400, {
+wafer = Wafer(top, 'WAFER', 150000)
+mask = Mask(top, 'MASK', 7*25400, {
         "DATE": "2020-03-12",
         "USER": "jorich",
         "LAYOUT": "DIODE-RUN-1"
@@ -119,3 +127,17 @@ top.add(gdspy.CellReference(testres, rotation=0, origin=(0, +62000)))
 
 ### Save the gds file
 lib.write_gds(args.output)
+
+if args.export is not None:
+    merge = MaskMerge(top)
+
+    for name, layers in config.GLOBAL["EXPORT"]:
+
+        mask.setMaskName(name)
+
+        gdspy.LayoutViewer(lib)
+
+        merge.refresh()
+        out = merge.mergeLayersIntoLib(layers, **config.GLOBAL["LAYERS"][name])
+
+        out.write_gds(args.export + "/%s.gds"%(name))
