@@ -23,6 +23,9 @@ class Mask(Element):
 
     def construct(self):
 
+        self.namecell = self.lib.new_cell(self.name + "_NAME")
+        self.cell.add(gdspy.CellReference(self.namecell))
+
         self._constructFrame()
 
         if len(self.text) > 0:
@@ -66,3 +69,19 @@ class Mask(Element):
             self.text, height=2000, origin=(x0, y0))
 
         self.cell.add(textcell)
+
+    def setMaskName(self, name):
+
+        ## Remove the previous mask name
+        self.namecell.remove_polygons(
+            lambda pts, layer, datatype:
+                layer == self.layers["MASK_NAME"]["layer"]
+                    and datatype == self.layers["MASK_NAME"]["datatype"]
+        )
+
+        if len(name) > 0:
+            namelabel = TextList(
+                self.layers["MASK_NAME"], self.namecell,
+                {name: ''}, height=2000,
+                origin=(0, -self.size/2 + 2.5*self.margin)
+            )
