@@ -2,6 +2,8 @@ import gdspy
 
 from .. import Element
 
+from ...forms import TextList
+
 class Mask(Element):
 
     T_HEIGHT = 2000
@@ -54,39 +56,13 @@ class Mask(Element):
 
 
     def _constructLabel(self):
-        T_HEIGHT = 2000
 
         x0 = -self.size/2 + 2.5*self.margin
         y0 = -self.size/2 + 2.5*self.margin
 
-        text = self.lib.new_cell(self.name + '_LABEL')
+        textcell = self.lib.new_cell(self.name + '_LABEL')
 
-        maxlabel = self._constructTextList(text, self.text.keys(), x0, y0)
-        maxvalue = self._constructTextList(text, self.text.values(), x0 + maxlabel*1.3, y0)
+        label = TextList(self.layers["MASK_LABEL"], textcell,
+            self.text, height=2000, origin=(x0, y0))
 
-        rect = gdspy.Rectangle(
-            (x0 - T_HEIGHT, y0 - T_HEIGHT),
-            (x0 + maxlabel*1.3 + maxvalue + T_HEIGHT, y0 + len(self.text)*self.T_HEIGHT*1.3 + self.T_HEIGHT),
-            **self.layers["MASK_LABEL"]
-        )
-        outset = gdspy.offset(rect, self.T_HEIGHT/2)
-
-        text.add(gdspy.boolean(outset, rect, 'not', **self.layers["MASK_LABEL"]))
-
-        self.cell.add(text)
-
-    def _constructTextList(self, cell, values, x, y):
-
-        maxlength = 0
-
-        for value in values:
-            t = gdspy.Text(value, self.T_HEIGHT, position=(x, y), **self.layers["MASK_LABEL"])
-            cell.add(t)
-
-            bbox = t.get_bounding_box()
-            length = bbox[1,0] - bbox[0,0]
-            if length > maxlength: maxlength = length
-
-            y += self.T_HEIGHT*1.3
-
-        return maxlength
+        self.cell.add(textcell)
