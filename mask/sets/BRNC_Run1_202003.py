@@ -1,27 +1,33 @@
 import gdspy
-
 import math
+import argparse
 
 from mask import config
-
 from mask.processes import BRNC_202003
 
 from mask.elements.electrical import Diode
 from mask.elements.meta import Wafer
 from mask.elements.meta import Mask
-from mask.elements.test import Resistance, VanDerPauwMetal
+from mask.elements.test import Resistance, VanDerPauwMetal, VanDerPauwContact
 from mask.elements.fabrication import MarkerCoarse, DeviceColumn
 from mask.forms import DicingLine
 
-lib = gdspy.GdsLibrary()#infile='Nanoscribe_Wafer_25mmx25mm_WithMarkers2.gds')
+
+parser = argparse.ArgumentParser(description='Create the mask layout for the BRNC Run-1 [202003].')
+parser.add_argument('-o', '--output', required=True,
+                    help='Name of the output file.')
+
+args = parser.parse_args()
+
+
+### Create the library and top cell
+lib = gdspy.GdsLibrary()
 config.GLOBAL["LIB"] = lib
 
 top = lib.new_cell('TOP_CELL')
 
-#top.add(lib.cells['noname'])
 
 ### Create meta cells
-
 w = Wafer(top, 'WAFER', 150000)
 m = Mask(top, 'MASK', 7*25400, {
         "DATE": "2020-03-12",
@@ -104,12 +110,12 @@ top.add(gdspy.CellReference(testres, rotation=-90, origin=(+62000, 0)))
 top.add(gdspy.CellReference(testres, rotation=0, origin=(0, +62000)))
 
 
+
 ### Add VDP test structures
-# vdp = VanDerPauwMetal(top, 'VDP_3mm', 1500)
+# vdp = VanDerPauwMetal(top, 'VDP_3mm', contactw=1000, contactspacing=2540)
+# vdp = VanDerPauwContact(top, 'VDP_3mm', contactw=1000, contactspacing=2540)
+
 
 
 ### Save the gds file
-
-lib.write_gds('BRNC_Run1_202003.gds')
-
-# gdspy.LayoutViewer(lib)
+lib.write_gds(args.output)
