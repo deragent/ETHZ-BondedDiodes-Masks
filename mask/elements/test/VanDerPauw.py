@@ -50,11 +50,13 @@ class VanDerPauwContact(Element):
     def __init__(
         self, parent, name,
         contactw=1000, contactspacing=2540,
+        overhang=10,
         layers=None, lib=None
     ):
 
         self.contactspacing = contactspacing
         self.contactw = contactw
+        self.overhang = overhang
 
         super().__init__(parent, name, layers, lib)
 
@@ -74,9 +76,9 @@ class VanDerPauwContact(Element):
                 y = v * self.contactspacing/2
 
                 ## TODO make offset customizable
-                o = 10
+                oh = self.overhang
 
-                contact = gdspy.Rectangle((-w2-o, -w2-o), (w2+o, +w2+o))
+                contact = gdspy.Rectangle((-w2-oh, -w2-oh), (w2+oh, +w2+oh))
                 arm = gdspy.FlexPath([(0,0), (-0.55*self.contactspacing, 0)], 2*w2/5).translate(0, 3*w2/5)
 
                 contact = gdspy.boolean(contact, arm, 'or', **self.layers["METALIZATION"])
