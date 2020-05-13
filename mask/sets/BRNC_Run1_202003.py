@@ -127,6 +127,8 @@ top.add(gdspy.CellReference(testres, rotation=0, origin=(0, +62000)))
 
 ### Save the gds file
 lib.write_gds(args.output)
+### Save and svg representation
+top.write_svg(args.output + '.svg', 0.1)
 
 if args.export is not None:
     merge = MaskMerge(top)
