@@ -106,8 +106,6 @@ if args.export is not None:
 
         mask.setMaskName(name)
 
-        gdspy.LayoutViewer(lib)
-
         merge.refresh()
         out = merge.mergeLayersIntoLib(layers, **config.GLOBAL["LAYERS"][name])
 
