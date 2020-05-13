@@ -28,8 +28,8 @@ class TLMContact(Element):
         oh = self.overhang
         cw = self.contactw
 
-        contact = gdspy.Rectangle((x, y), (x + cw, y + cw), **self.layers["METALIZATION"])
-        open = gdspy.Rectangle((x + oh, y + oh), (x + cw - oh, y + cw - oh), **self.layers["PASSIVATION_OPEN"])
+        contact = gdspy.Rectangle((x, y - oh), (x + cw + 2*oh, y + cw + oh), **self.layers["METALIZATION"])
+        open = gdspy.Rectangle((x + oh, y), (x + cw + oh, y + cw), **self.layers["PASSIVATION_OPEN"])
 
         self.cell.add(contact)
         self.cell.add(open)
@@ -40,6 +40,7 @@ class TLMContact(Element):
         cw = self.contactw
         sw2 = self.stripw/2
         so = self.stripoverlap
+        oh = self.overhang
 
         hw = 4*so
 
@@ -47,9 +48,11 @@ class TLMContact(Element):
 
         mid = ((cs/2 - cw/2)/2 + so/2)
 
+        # First vertical path
         vert1 = gdspy.Rectangle((x, -sw2*v_dir), (x + so, v_dir*mid), **self.layers["METALIZATION"])
         self.cell.add(vert1)
 
+        # Decide if horizontal path is necessary
         if x + so > n*cs + cw:
             h_dir = -1
             hw = max(hw, x + so - (n*cs + cw))
@@ -60,10 +63,12 @@ class TLMContact(Element):
             h_dir = 0
 
         if h_dir != 0:
+            # Add horizontal path
             hor = gdspy.Rectangle((x + so/2*(1 - h_dir), v_dir*mid), (x + h_dir*hw + so/2*(1 - h_dir), v_dir*(mid + so)), **self.layers["METALIZATION"])
             self.cell.add(hor)
 
-        vert2 = gdspy.Rectangle((x + h_dir*hw, v_dir*mid), (x + h_dir*hw + so, v_dir*(cs/2 - cw/2)), **self.layers["METALIZATION"])
+        # Second vertical path
+        vert2 = gdspy.Rectangle((x + h_dir*hw, v_dir*mid), (x + h_dir*hw + so, v_dir*(cs/2 - cw/2 - oh)), **self.layers["METALIZATION"])
         self.cell.add(vert2)
 
 
@@ -79,13 +84,17 @@ class TLMContact(Element):
 
         so = self.stripoverlap
 
+        # Total length of the resistive strip
         maxl = max(self.lengths) + 2*so
 
+        # Number of contact pairs
         ncontact = math.ceil(maxl / cs) + 1
 
+        # Add the resistive strip
         strip = gdspy.Rectangle((-oh, -sw2), (maxl + oh, sw2), **self.layers["CONTACT_DOPING"])
         self.cell.add(strip)
 
+        # Add the contact pairs
         for cc in range(0, ncontact):
             x = cc*(cs)
             self._addContact(x, cs/2 - cw/2)
@@ -93,8 +102,8 @@ class TLMContact(Element):
 
 
 
-        ## Contact 0
-        contact_0 = gdspy.Rectangle((0, -sw2), (so, cs/2 - cw/2), **self.layers["METALIZATION"])
+        ## Contact connection for '0'
+        contact_0 = gdspy.Rectangle((0, -sw2), (so, cs/2 - cw/2 - oh), **self.layers["METALIZATION"])
         self.cell.add(contact_0)
 
         ## Make all connections to contacts
