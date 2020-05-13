@@ -7,16 +7,15 @@ gdspy.library.use_current_library = False
 
 from mask import config
 from mask.processes import BRNC_202003
+from mask.macros import Run1_TestSet
 
 from mask.tools import MaskMerge
 
 from mask.elements.electrical import Diode
 from mask.elements.meta import Wafer
 from mask.elements.meta import Mask
-from mask.elements.test import VanDerPauwMetal, VanDerPauwContact
 from mask.elements.fabrication import MarkerCoarse, DeviceColumn
 from mask.forms import DicingLine
-from mask.forms import TextList
 
 
 parser = argparse.ArgumentParser(description='Create the mask layout for the BRNC Run-1 [202003].')
@@ -87,12 +86,12 @@ top_dicing = DicingLine(config.GLOBAL["LAYERS"]["DICING"], diodes,
 
 top.add(diodes)
 
+## Add test structures (VPD + TLM)
+testset = Run1_TestSet(lib)
 
-
-### Add VDP test structures
-# vdp = VanDerPauwMetal(top, 'VDP_3mm', contactw=1000, contactspacing=2540)
-# vdp = VanDerPauwContact(top, 'VDP_3mm', contactw=1000, contactspacing=2540)
-
+top.add(gdspy.CellReference(testset, rotation=90, origin=(-61500, 0)))
+top.add(gdspy.CellReference(testset, rotation=-90, origin=(+61500, 0)))
+top.add(gdspy.CellReference(testset, rotation=0, origin=(0, +61500)))
 
 
 ### Save the gds file
