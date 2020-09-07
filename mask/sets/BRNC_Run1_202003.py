@@ -59,12 +59,12 @@ d6 = Diode(None, 'DIODE_6mm', 6000, rounding=600)
 d4 = Diode(None, 'DIODE_4mm', 4000, rounding=400)
 d2 = Diode(None, 'DIODE_2mm', 2000, rounding=200)
 
-margin = 150
+margin = 350
 dicingwidth = 100
 
 xoffset = margin
 
-ymin = [-61500, -61500, -57000, -51000, -45000, -40500]
+ymin = [-61500, -61500, -56000, -49000, -42000, -36500]
 ymax = 50300
 
 for ii, d in enumerate([d15, d12, d8, d6, d4, d2]):
@@ -82,16 +82,16 @@ for ii, d in enumerate([d15, d12, d8, d6, d4, d2]):
     xoffset += d.width + 2*margin
 
 top_dicing = DicingLine(config.GLOBAL["LAYERS"]["DICING"], diodes,
-    dicingwidth, (-49000, 50000), (49000, 50000))
+    dicingwidth, (-48400, 50500), (48400, 50500))
 
 top.add(diodes)
 
 ## Add test structures (VPD + TLM)
 testset = Run1_TestSet(lib)
 
-top.add(gdspy.CellReference(testset, rotation=90, origin=(-61500, 0)))
-top.add(gdspy.CellReference(testset, rotation=-90, origin=(+61500, 0)))
-top.add(gdspy.CellReference(testset, rotation=0, origin=(0, +61500)))
+top.add(gdspy.CellReference(testset, rotation=90, origin=(-63000, -5000)))
+top.add(gdspy.CellReference(testset, rotation=-90, origin=(+63000, +5000)))
+top.add(gdspy.CellReference(testset, rotation=0, origin=(-5000, +63000)))
 
 
 ### Save the gds file
