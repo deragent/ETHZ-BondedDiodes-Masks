@@ -52,12 +52,12 @@ top.add(markers)
 ### Create diode cells
 diodes = lib.new_cell('DIODES')
 
-d15 = Diode(None, 'DIODE_15mm', 15000)
-d12 = Diode(None, 'DIODE_12mm', 12000)
-d8 = Diode(None, 'DIODE_8mm', 8000)
-d6 = Diode(None, 'DIODE_6mm', 6000)
-d4 = Diode(None, 'DIODE_4mm', 4000)
-d2 = Diode(None, 'DIODE_2mm', 2000)
+d15 = Diode(None, 'DIODE_15mm', 15000, rounding=1500)
+d12 = Diode(None, 'DIODE_12mm', 12000, rounding=1200)
+d8 = Diode(None, 'DIODE_8mm', 8000, rounding=800)
+d6 = Diode(None, 'DIODE_6mm', 6000, rounding=600)
+d4 = Diode(None, 'DIODE_4mm', 4000, rounding=400)
+d2 = Diode(None, 'DIODE_2mm', 2000, rounding=200)
 
 margin = 150
 dicingwidth = 100
