@@ -6,7 +6,9 @@ from ...forms import GuardRings
 
 class Diode(Element):
 
-    def __init__(self, parent, name, size, overhang=10, layers=None, lib=None):
+    def __init__(self, parent, name, size, rounding=0, overhang=10, layers=None, lib=None, tolerance=40):
+
+        self.tolerance = 40
 
         try:
             self.A = size[0]
@@ -16,6 +18,10 @@ class Diode(Element):
             self.B = size
 
         self.overhang = overhang
+        if rounding > 0:
+            self.rounding = rounding
+        else:
+            self.rounding = None
 
         super().__init__(parent, name, layers, lib)
 
@@ -27,24 +33,33 @@ class Diode(Element):
 
     def __createDiode(self, layer, overhang = 0):
 
-        sA = self.A/2 + overhang
-        sB = self.B/2 + overhang
+        r = self.rounding if self.rounding is not None else 0
+
+        sA = self.A/2 + overhang - r
+        sB = self.B/2 + overhang - r
         oh = overhang
 
         rect = gdspy.Rectangle((-sA, -sB), (sA, sB), **layer)
 
-        self.cell.add(rect)
+        if self.rounding is None:
+            form = rect
+        else:
+            form = gdspy.offset(rect, r, join='round', tolerance=self.tolerance, **layer)
+
+        self.cell.add(form)
 
     def __createGuardRings(self, layer, overhang = 0):
 
-        sA = self.A/2
-        sB = self.B/2
+        r = self.rounding if self.rounding is not None else 0
+
+        sA = self.A/2 - r
+        sB = self.B/2 - r
         oh = overhang
 
         rect = gdspy.Rectangle((-sA, -sB), (sA, sB), **layer)
 
         GuardRings(layer, self.cell, rect, [
-            (50-oh, 50+2*oh),
+            (r + 50-oh, 50+2*oh),
             (50-2*oh, 50+2*oh),
             (50-2*oh, 50+2*oh),
             (50-2*oh, 50+2*oh),
