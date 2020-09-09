@@ -5,6 +5,7 @@ DIR = files/${PROJECT}/
 GDS_FILE = ${DIR}${PROJECT}
 
 ${GDS_FILE}.gds: ${PYTHON_FILES}
+	[ -f mask/sets/${PROJECT}.py ] || (>&2 echo "Project file [mask/sets/${PROJECT}.py] does not exist" && exit 1)
 	mkdir -p ${DIR}
 	python3 -m mask.sets.${PROJECT} --output ${GDS_FILE}.gds
 
