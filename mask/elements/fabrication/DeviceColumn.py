@@ -6,9 +6,13 @@ from ...forms import DicingLine
 
 class DeviceColumn(Element):
 
-    def __init__(self, parent, name, device, x, ymin, ymax, margin=150, dicingwidth=100, keepout=[], layers=None, lib=None):
+    def __init__(self, parent, name, devices, x, ymin, ymax, margin=150, dicingwidth=100, keepout=[], layers=None, lib=None):
 
-        self.device = device
+        if type(devices) == type([]):
+            self.devices = devices
+        else:
+            self.devices = [devices]
+        self.n_devices = len(self.devices)
 
         self.x = x
         self.ymin = ymin
@@ -24,9 +28,14 @@ class DeviceColumn(Element):
 
         m = self.margin
 
-        bbox = self.device.get_bounding_box()
+        bbox = self.__extractCommonBBox(self.devices)
+
         devw = bbox[1,0] - bbox[0,0]
         devh = bbox[1,1] - bbox[0,1]
+
+        # TODO: This code currently assumes, that the cells to be repeated in
+        # column are symmetric around X=0 and Y=0. This is not always the case.
+        # To be fixed in the future!
 
         doffset = devw / 2 + m
 
@@ -34,9 +43,11 @@ class DeviceColumn(Element):
 
         ymax = 0
 
+        dev_index = 0
+
         while True:
 
-            ref = gdspy.CellReference(self.device, origin=origin)
+            ref = gdspy.CellReference(self.devices[dev_index], origin=origin)
 
             if ref.get_bounding_box()[1,1] > self.ymax:
                 break
@@ -62,11 +73,31 @@ class DeviceColumn(Element):
 
             origin = (origin[0], origin[1] + devh + 2*m)
 
+            dev_index = (dev_index + 1)%self.n_devices
+
+
         ## Add left and right dicing line
         dicing_left = DicingLine(self.layers["DICING"], self.cell,
             self.dicingwidth, (self.x - doffset, self.ymin), (self.x - doffset, ymax + m))
         dicing_right = DicingLine(self.layers["DICING"], self.cell,
             self.dicingwidth, (self.x + doffset, self.ymin), (self.x + doffset, ymax + m))
+
+
+    def __extractCommonBBox(self, devices):
+        if len(devices) < 1:
+            return None
+
+        common = devices[0].get_bounding_box()
+        for dev in devices[1:]:
+            bbox = dev.get_bounding_box()
+
+            common[0,0] = min(common[0,0], bbox[0,0])
+            common[0,1] = min(common[0,1], bbox[0,1])
+            common[1,0] = max(common[1,0], bbox[1,0])
+            common[1,1] = max(common[1,1], bbox[1,1])
+
+        return common
+
 
 
     def __inKeepout(self, bbox):
