@@ -53,11 +53,17 @@ top.add(markers)
 diodes = lib.new_cell('DIODES')
 
 d15 = Diode(None, 'DIODE_15mm', 15000, rounding=1500)
+d15_w = Diode(None, 'DIODE_W_15mm', 15000, rounding=1500, window=3000)
 d12 = Diode(None, 'DIODE_12mm', 12000, rounding=1200)
+d12_w = Diode(None, 'DIODE_W_12mm', 12000, rounding=1200, window=3000)
 d8 = Diode(None, 'DIODE_8mm', 8000, rounding=800)
+d8_w = Diode(None, 'DIODE_W_8mm', 8000, rounding=800, window=2000)
 d6 = Diode(None, 'DIODE_6mm', 6000, rounding=600)
+d6_w = Diode(None, 'DIODE_W_6mm', 6000, rounding=600, window=2000)
 d4 = Diode(None, 'DIODE_4mm', 4000, rounding=400)
+d4_w = Diode(None, 'DIODE_W_4mm', 4000, rounding=400, window=1000)
 d2 = Diode(None, 'DIODE_2mm', 2000, rounding=200)
+d2_w = Diode(None, 'DIODE_W_2mm', 2000, rounding=200, window=1000)
 
 margin = 350
 dicingwidth = 100
@@ -67,19 +73,30 @@ xoffset = margin
 ymin = [-61500, -61500, -56000, -49000, -42000, -36500]
 ymax = 50300
 
-for ii, d in enumerate([d15, d12, d8, d6, d4, d2]):
+DIODE_CONFIGS = [
+    [d15_w, d15, d15],
+    [d12_w, d12, d12],
+    [d8_w, d8, d8],
+    [d6_w, d6, d6],
+    [d4_w, d4, d4],
+    [d2_w, d2, d2],
+]
 
-    x = xoffset + d.width/2
+for ii, elements in enumerate(DIODE_CONFIGS):
 
-    column_r = DeviceColumn(diodes, 'COLUMN_R_%s'%(d.name), d.cell,
+    devices = [d.cell for d in elements]
+
+    x = xoffset + elements[0].width/2
+
+    column_r = DeviceColumn(diodes, 'COLUMN_R_%s'%(elements[0].name), devices,
         x, ymin[ii], min(-1*ymin[ii], ymax),
         margin=margin, dicingwidth=dicingwidth, keepout=keepouts)
 
-    column_l = DeviceColumn(diodes, 'COLUMN_L_%s'%(d.name), d.cell,
+    column_l = DeviceColumn(diodes, 'COLUMN_L_%s'%(elements[0].name), devices,
         -1*x, ymin[ii], min(-1*ymin[ii], ymax),
         margin=margin, dicingwidth=dicingwidth, keepout=keepouts)
 
-    xoffset += d.width + 2*margin
+    xoffset += elements[0].width + 2*margin
 
 top_dicing = DicingLine(config.GLOBAL["LAYERS"]["DICING"], diodes,
     dicingwidth, (-48400, 50500), (48400, 50500))
