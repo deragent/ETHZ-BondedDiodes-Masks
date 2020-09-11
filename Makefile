@@ -13,6 +13,9 @@ ${GDS_FILE}.gds: ${PYTHON_FILES}
 show: check ${GDS_FILE}.gds
 	klayout ${GDS_FILE}.gds
 
+clean: check
+	rm -r ${DIR}
+
 export: check ${GDS_FILE}.gds
 	mkdir -p ${DIR}export
 	rm ${DIR}export/* -f
