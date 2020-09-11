@@ -23,6 +23,8 @@ parser.add_argument('-o', '--output', required=True,
                     help='Name of the output file.')
 parser.add_argument('-e', '--export', default=None,
                     help='Flag to export the fabrication mask layers into individual files.')
+parser.add_argument('-s', '--side', default=None, choices=["N", "P"],
+                    help='Generate the mask for a specific side of the diodes.')
 
 args = parser.parse_args()
 
@@ -52,8 +54,11 @@ top.add(markers)
 ### Create diode cells
 diodes = lib.new_cell('DIODES')
 
-LABEL_HEIGHT = 500
-LABEL = ("N", LABEL_HEIGHT)
+if args.side is not None:
+    LABEL_HEIGHT = 500
+    LABEL = (args.side, LABEL_HEIGHT)
+else:
+    LABEL = None
 
 d15 = Diode(None, 'DIODE_15mm', 15000, rounding=1500, label=LABEL)
 d15_w = Diode(None, 'DIODE_W_15mm', 15000, rounding=1500, window=3000, label=LABEL)
