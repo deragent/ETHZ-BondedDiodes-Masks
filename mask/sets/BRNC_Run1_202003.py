@@ -52,18 +52,21 @@ top.add(markers)
 ### Create diode cells
 diodes = lib.new_cell('DIODES')
 
-d15 = Diode(None, 'DIODE_15mm', 15000, rounding=1500)
-d15_w = Diode(None, 'DIODE_W_15mm', 15000, rounding=1500, window=3000)
-d12 = Diode(None, 'DIODE_12mm', 12000, rounding=1200)
-d12_w = Diode(None, 'DIODE_W_12mm', 12000, rounding=1200, window=3000)
-d8 = Diode(None, 'DIODE_8mm', 8000, rounding=800)
-d8_w = Diode(None, 'DIODE_W_8mm', 8000, rounding=800, window=2000)
-d6 = Diode(None, 'DIODE_6mm', 6000, rounding=600)
-d6_w = Diode(None, 'DIODE_W_6mm', 6000, rounding=600, window=2000)
-d4 = Diode(None, 'DIODE_4mm', 4000, rounding=400)
-d4_w = Diode(None, 'DIODE_W_4mm', 4000, rounding=400, window=1000)
-d2 = Diode(None, 'DIODE_2mm', 2000, rounding=200)
-d2_w = Diode(None, 'DIODE_W_2mm', 2000, rounding=200, window=1000)
+LABEL_HEIGHT = 500
+LABEL = ("N", LABEL_HEIGHT)
+
+d15 = Diode(None, 'DIODE_15mm', 15000, rounding=1500, label=LABEL)
+d15_w = Diode(None, 'DIODE_W_15mm', 15000, rounding=1500, window=3000, label=LABEL)
+d12 = Diode(None, 'DIODE_12mm', 12000, rounding=1200, label=LABEL)
+d12_w = Diode(None, 'DIODE_W_12mm', 12000, rounding=1200, window=3000, label=LABEL)
+d8 = Diode(None, 'DIODE_8mm', 8000, rounding=800, label=LABEL)
+d8_w = Diode(None, 'DIODE_W_8mm', 8000, rounding=800, window=2000, label=LABEL)
+d6 = Diode(None, 'DIODE_6mm', 6000, rounding=600, label=LABEL)
+d6_w = Diode(None, 'DIODE_W_6mm', 6000, rounding=600, window=2000, label=LABEL)
+d4 = Diode(None, 'DIODE_4mm', 4000, rounding=400, label=LABEL)
+d4_w = Diode(None, 'DIODE_W_4mm', 4000, rounding=400, window=1000, label=LABEL)
+d2 = Diode(None, 'DIODE_2mm', 2000, rounding=200, label=LABEL)
+d2_w = Diode(None, 'DIODE_W_2mm', 2000, rounding=200, window=1000, label=LABEL)
 
 margin = 350
 dicingwidth = 100
