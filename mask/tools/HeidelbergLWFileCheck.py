@@ -36,6 +36,12 @@ class HeidelbergLWFileCheck():
             for cell in top.get_dependencies(recursive=True):
                 self._checkCellName(cell.name)
 
+        ## TODO: Add verification if centered around [0,0]
+
+        ## TODO maybe: Check if all polygons are closed
+
+        ## TODO maybe: Check if contains text which is not polygons
+
         return self.errors == 0
 
 
