@@ -20,10 +20,11 @@ class MarkerField(Element):
         offset = 0
         layers = []
 
-        for number, l1, l2, size in self.config:
+        for number, l1, l2, size, inv1, inv2 in self.config:
 
             marker = MarkerCoarse(None, 'MARKER_%s_%s'%(l1, l2), number,
                 l1, l2, size=size,
+                inverted=(inv1, inv2),
                 layers=self.layers, lib=self.lib)
 
             self.cell.add(gdspy.CellReference(
@@ -33,7 +34,10 @@ class MarkerField(Element):
 
             layers.extend([l1, l2])
 
-            offset += marker.width*1.5
+            if inv1 or inv2:
+                offset += marker.width
+            else:
+                offset += marker.width*1.5
 
         self.__addArrows(set(layers))
 

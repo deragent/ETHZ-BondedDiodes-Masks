@@ -45,8 +45,8 @@ def createMarkers(lib):
     markers = lib.new_cell('MARKERS')
 
     field = MarkerField(None, 'MARKER_FIELD', [
-        ('1', 'ALIGNMENT_MARKS', 'CONTACT_DOPING', 20),
-        ('2', 'ALIGNMENT_MARKS', 'METALIZATION', 20),
+        ('1', 'ALIGNMENT_MARKS', 'CONTACT_DOPING', 20, False, True),
+        ('2', 'ALIGNMENT_MARKS', 'METALIZATION', 20, False, False),
     ])
 
 
