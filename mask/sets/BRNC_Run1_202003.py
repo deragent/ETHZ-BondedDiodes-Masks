@@ -46,7 +46,7 @@ def main(args):
     diodes = lib.new_cell('DIODES')
 
     if args.side is not None:
-        LABEL_HEIGHT = 500
+        LABEL_HEIGHT = 300
         LABEL = (args.side, LABEL_HEIGHT)
     else:
         LABEL = None
