@@ -50,10 +50,7 @@ def main(args):
 
     LABEL_HEIGHT = 300
 
-    # if args.side is not None:
-    #     LABEL = (args.side, LABEL_HEIGHT)
-    # else:
-    #     LABEL = None
+    ADD_LABEL = (args.side == 'N')
 
     margin = 350
     dicingwidth = 100
@@ -75,13 +72,17 @@ def main(args):
     for ii, config in enumerate(DIODE_CONFIGS):
 
         def createDiode(count, index):
-            label = config[3] + str(count)
+            if ADD_LABEL:
+                label = (config[3] + str(count), LABEL_HEIGHT)
+            else:
+                label = None
+
             name = config[0] + '_%i'%(count)
             window = config[2] if (index % 3) == 2 else 0
 
             element = Diode(None, name, config[1],
                             rounding=(config[1]/10), window=window,
-                            label=(label, LABEL_HEIGHT))
+                            label=label)
 
             return element.cell
 
