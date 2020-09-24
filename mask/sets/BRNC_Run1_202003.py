@@ -4,7 +4,7 @@ import math
 ## Disable the default lib to make multi lib use possible
 gdspy.library.use_current_library = False
 
-from mask import config
+from mask import config as GC
 from mask.processes import BRNC_202003
 from mask.macros import Run1_TestSet
 
@@ -23,7 +23,7 @@ def main(args):
 
     ### Create the library and top cell
     lib = gdspy.GdsLibrary()
-    config.GLOBAL["LIB"] = lib
+    GC.GLOBAL["LIB"] = lib
 
     top = lib.new_cell('TOP_CELL')
 
@@ -98,7 +98,7 @@ def main(args):
 
         xoffset += elements[0].width + 2*margin
 
-    top_dicing = DicingLine(config.GLOBAL["LAYERS"]["DICING"], diodes,
+    top_dicing = DicingLine(GC.GLOBAL["LAYERS"]["DICING"], diodes,
         dicingwidth, (-48400, 50500), (48400, 50500))
 
     top.add(diodes)
@@ -119,12 +119,12 @@ def main(args):
     if args.export is not None:
         merge = MaskMerge(top)
 
-        for name, layers in config.GLOBAL["EXPORT"]:
+        for name, layers in GC.GLOBAL["EXPORT"]:
 
             mask.setMaskName(name)
 
             merge.refresh()
-            out = merge.mergeLayersIntoLib(layers, **config.GLOBAL["LAYERS"][name])
+            out = merge.mergeLayersIntoLib(layers, **GC.GLOBAL["LAYERS"][name])
 
             out.write_gds(args.export + "/%s.gds"%(name))
 
