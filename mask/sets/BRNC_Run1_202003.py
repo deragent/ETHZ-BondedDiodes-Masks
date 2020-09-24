@@ -15,6 +15,7 @@ from mask.elements.meta import Wafer
 from mask.elements.meta import Mask
 from mask.elements.fabrication import MarkerCoarse, DeviceColumn
 from mask.forms import DicingLine
+from mask.elements import ReferenceGenerator
 
 
 
@@ -83,15 +84,15 @@ def main(args):
 
     for ii, elements in enumerate(DIODE_CONFIGS):
 
-        devices = [d.cell for d in elements]
+        generator = ReferenceGenerator([d.cell for d in elements])
 
         x = xoffset + elements[0].width/2
 
-        column_r = DeviceColumn(diodes, 'COLUMN_R_%s'%(elements[0].name), devices,
+        column_r = DeviceColumn(diodes, 'COLUMN_R_%s'%(elements[0].name), generator,
             x, ymin[ii], min(-1*ymin[ii], ymax),
             margin=margin, dicingwidth=dicingwidth, keepout=keepouts)
 
-        column_l = DeviceColumn(diodes, 'COLUMN_L_%s'%(elements[0].name), devices,
+        column_l = DeviceColumn(diodes, 'COLUMN_L_%s'%(elements[0].name), generator,
             -1*x, ymin[ii], min(-1*ymin[ii], ymax),
             margin=margin, dicingwidth=dicingwidth, keepout=keepouts)
 
