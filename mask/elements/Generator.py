@@ -8,6 +8,9 @@ class Generator():
     def instance(self):
         raise NotImplementedError
 
+    def retract(self):
+        raise NotImplementedError
+
     def reset(self):
         raise NotImplementedError
 
@@ -50,6 +53,9 @@ class ReferenceGenerator(Generator):
 
         return ref
 
+    def retract(self):
+        self.index = (self.index + (self.n_devices - 1))%self.n_devices
+
 
 class CallbackGenerator(Generator):
 
@@ -80,6 +86,12 @@ class CallbackGenerator(Generator):
         self.count += 1
 
         return ref
+
+    def retract(self):
+        self.index -= 1
+        self.count -= 1
+
+        self.cells.pop()
 
     def addCellsToLib(self, lib):
         for cell in self.cells:

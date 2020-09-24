@@ -47,11 +47,13 @@ class DeviceColumn(Element):
             ref.translate(*origin)
 
             if ref.get_bounding_box()[1,1] > self.ymax:
+                self.generator.retract()
                 break
 
             collision = self.__inKeepout(ref.get_bounding_box())
             if collision is not None:
                 origin = (origin[0], origin[1] + collision + 3*m)
+                self.generator.retract()
                 continue
 
             ref_ymin = ref.get_bounding_box()[0,1]
