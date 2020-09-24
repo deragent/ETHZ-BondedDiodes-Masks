@@ -6,13 +6,9 @@ from ...forms import DicingLine
 
 class DeviceColumn(Element):
 
-    def __init__(self, parent, name, devices, x, ymin, ymax, margin=150, dicingwidth=100, keepout=[], layers=None, lib=None):
+    def __init__(self, parent, name, generator, x, ymin, ymax, margin=150, dicingwidth=100, keepout=[], layers=None, lib=None):
 
-        if type(devices) == type([]):
-            self.devices = devices
-        else:
-            self.devices = [devices]
-        self.n_devices = len(self.devices)
+        self.generator = generator
 
         self.x = x
         self.ymin = ymin
@@ -28,7 +24,7 @@ class DeviceColumn(Element):
 
         m = self.margin
 
-        bbox = self.__extractCommonBBox(self.devices)
+        bbox = self.generator.bbox()
 
         devw = bbox[1,0] - bbox[0,0]
         devh = bbox[1,1] - bbox[0,1]
@@ -47,7 +43,8 @@ class DeviceColumn(Element):
 
         while True:
 
-            ref = gdspy.CellReference(self.devices[dev_index], origin=origin)
+            ref = self.generator.instance()
+            ref.translate(*origin)
 
             if ref.get_bounding_box()[1,1] > self.ymax:
                 break
@@ -73,30 +70,12 @@ class DeviceColumn(Element):
 
             origin = (origin[0], origin[1] + devh + 2*m)
 
-            dev_index = (dev_index + 1)%self.n_devices
-
 
         ## Add left and right dicing line
         dicing_left = DicingLine(self.layers["DICING"], self.cell,
             self.dicingwidth, (self.x - doffset, self.ymin), (self.x - doffset, ymax + m))
         dicing_right = DicingLine(self.layers["DICING"], self.cell,
             self.dicingwidth, (self.x + doffset, self.ymin), (self.x + doffset, ymax + m))
-
-
-    def __extractCommonBBox(self, devices):
-        if len(devices) < 1:
-            return None
-
-        common = devices[0].get_bounding_box()
-        for dev in devices[1:]:
-            bbox = dev.get_bounding_box()
-
-            common[0,0] = min(common[0,0], bbox[0,0])
-            common[0,1] = min(common[0,1], bbox[0,1])
-            common[1,0] = max(common[1,0], bbox[1,0])
-            common[1,1] = max(common[1,1], bbox[1,1])
-
-        return common
 
 
 
