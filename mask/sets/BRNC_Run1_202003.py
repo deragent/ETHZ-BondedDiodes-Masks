@@ -1,6 +1,8 @@
 import gdspy
 import math
 
+import numpy as np
+
 ## Disable the default lib to make multi lib use possible
 gdspy.library.use_current_library = False
 
@@ -15,7 +17,7 @@ from mask.elements.meta import Wafer
 from mask.elements.meta import Mask
 from mask.elements.fabrication import MarkerCoarse, DeviceColumn
 from mask.forms import DicingLine
-from mask.elements import ReferenceGenerator
+from mask.elements import CallbackGenerator
 
 
 
@@ -46,24 +48,12 @@ def main(args):
     ### Create diode cells
     diodes = lib.new_cell('DIODES')
 
-    if args.side is not None:
-        LABEL_HEIGHT = 300
-        LABEL = (args.side, LABEL_HEIGHT)
-    else:
-        LABEL = None
+    LABEL_HEIGHT = 300
 
-    d15 = Diode(None, 'DIODE_15mm', 15000, rounding=1500, label=LABEL)
-    d15_w = Diode(None, 'DIODE_W_15mm', 15000, rounding=1500, window=3000, label=LABEL)
-    d12 = Diode(None, 'DIODE_12mm', 12000, rounding=1200, label=LABEL)
-    d12_w = Diode(None, 'DIODE_W_12mm', 12000, rounding=1200, window=3000, label=LABEL)
-    d8 = Diode(None, 'DIODE_8mm', 8000, rounding=800, label=LABEL)
-    d8_w = Diode(None, 'DIODE_W_8mm', 8000, rounding=800, window=2000, label=LABEL)
-    d6 = Diode(None, 'DIODE_6mm', 6000, rounding=600, label=LABEL)
-    d6_w = Diode(None, 'DIODE_W_6mm', 6000, rounding=600, window=2000, label=LABEL)
-    d4 = Diode(None, 'DIODE_4mm', 4000, rounding=400, label=LABEL)
-    d4_w = Diode(None, 'DIODE_W_4mm', 4000, rounding=400, window=1000, label=LABEL)
-    d2 = Diode(None, 'DIODE_2mm', 2000, rounding=200, label=LABEL)
-    d2_w = Diode(None, 'DIODE_W_2mm', 2000, rounding=200, window=1000, label=LABEL)
+    # if args.side is not None:
+    #     LABEL = (args.side, LABEL_HEIGHT)
+    # else:
+    #     LABEL = None
 
     margin = 350
     dicingwidth = 100
@@ -74,29 +64,44 @@ def main(args):
     ymax = 50300
 
     DIODE_CONFIGS = [
-        [d15_w, d15, d15],
-        [d12_w, d12, d12],
-        [d8_w, d8, d8],
-        [d6_w, d6, d6],
-        [d4_w, d4, d4],
-        [d2_w, d2, d2],
+        ['DIODE_15mm', 15000, 3000, 'A', 16300],
+        ['DIODE_12mm', 12000, 3000, 'B', 13300],
+        ['DIODE_8mm', 8000, 2000, 'C', 9300],
+        ['DIODE_6mm', 6000, 2000, 'D', 7300],
+        ['DIODE_4mm', 4000, 1000, 'E', 5300],
+        ['DIODE_2mm', 2000, 1000, 'F', 3300],
     ]
 
-    for ii, elements in enumerate(DIODE_CONFIGS):
+    for ii, config in enumerate(DIODE_CONFIGS):
 
-        generator = ReferenceGenerator([d.cell for d in elements])
+        x = xoffset + config[4]/2
 
-        x = xoffset + elements[0].width/2
+        def createDiode(count, index):
+            label = config[3] + str(count)
+            name = config[0] + '_%i'%(count)
+            window = config[2] if (index % 3) == 2 else 0
 
-        column_r = DeviceColumn(diodes, 'COLUMN_R_%s'%(elements[0].name), generator,
+            element = Diode(None, name, config[1],
+                            rounding=(config[1]/10), window=window,
+                            label=(label, LABEL_HEIGHT))
+
+            return element.cell
+
+        bbox = np.array([ [-config[4]/2, -config[4]/2], [config[4]/2, config[4]/2] ])
+        generator = CallbackGenerator(bbox, createDiode)
+
+        column_r = DeviceColumn(diodes, 'COLUMN_R_%s'%(config[0]), generator,
             x, ymin[ii], min(-1*ymin[ii], ymax),
             margin=margin, dicingwidth=dicingwidth, keepout=keepouts)
 
-        column_l = DeviceColumn(diodes, 'COLUMN_L_%s'%(elements[0].name), generator,
+        generator.reset()
+
+        column_l = DeviceColumn(diodes, 'COLUMN_L_%s'%(config[0]), generator,
             -1*x, ymin[ii], min(-1*ymin[ii], ymax),
             margin=margin, dicingwidth=dicingwidth, keepout=keepouts)
 
-        xoffset += elements[0].width + 2*margin
+
+        xoffset += config[4] + 2*margin
 
     top_dicing = DicingLine(GC.GLOBAL["LAYERS"]["DICING"], diodes,
         dicingwidth, (-48400, 50500), (48400, 50500))
