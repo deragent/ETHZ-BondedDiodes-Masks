@@ -52,7 +52,7 @@ class Diode(Element):
             form = gdspy.boolean(form, hole, 'not', **layer)
 
         if label is not None:
-            t = gdspy.Text(label[0], label[1], position=(self.A*0.45 - label[1], self.B*0.45 - label[1]), **layer)
+            t = gdspy.Text(label[0], label[1], position=(self.A*-0.45, self.B*0.45 - label[1]), **layer)
             form = gdspy.boolean(form, t, 'not', **layer)
 
 
