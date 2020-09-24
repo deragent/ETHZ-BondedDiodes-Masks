@@ -11,17 +11,17 @@ def Run1_TestSet(lib):
     testset = lib.new_cell('TEST_SET')
 
     tlm = TLMContact(
-        None, 'TLM',
+        lib, 'TLM',
         [1000, 2000, 3000, 5000, 8000, 10000, 12000, 15000],
         contactw=CONTACT_WIDTH, contactspacing=CONTACT_SPACING, overhang=OVERHANG
     )
 
     vdp_metal = VanDerPauwMetal(
-        None, 'VDPMetal',
+        lib, 'VDPMetal',
         contactw=CONTACT_WIDTH, contactspacing=CONTACT_SPACING
     )
     vdp_contact = VanDerPauwContact(
-        None, 'VDPContact',
+        lib, 'VDPContact',
         contactw=CONTACT_WIDTH, contactspacing=CONTACT_SPACING, overhang=OVERHANG
     )
 

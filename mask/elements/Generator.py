@@ -80,3 +80,7 @@ class CallbackGenerator(Generator):
         self.count += 1
 
         return ref
+
+    def addCellsToLib(self, lib):
+        for cell in self.cells:
+            lib.add(cell)

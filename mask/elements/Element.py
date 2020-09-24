@@ -1,3 +1,5 @@
+import gdspy
+
 from .. import config
 
 class Element():
@@ -15,7 +17,7 @@ class Element():
             lib = config.GLOBAL["LIB"]
         self.lib = lib
 
-        self.cell = self.lib.new_cell(name)
+        self.cell = gdspy.Cell(name)
 
         self.construct()
 

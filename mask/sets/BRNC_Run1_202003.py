@@ -101,6 +101,8 @@ def main(args):
             margin=margin, dicingwidth=dicingwidth, keepout=keepouts)
 
 
+        generator.addCellsToLib(lib)
+
         xoffset += config[4] + 2*margin
 
     top_dicing = DicingLine(GC.GLOBAL["LAYERS"]["DICING"], diodes,
