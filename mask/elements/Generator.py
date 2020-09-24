@@ -49,3 +49,34 @@ class ReferenceGenerator(Generator):
         self.index = (self.index + 1)%self.n_devices
 
         return ref
+
+
+class CallbackGenerator(Generator):
+
+    def __init__(self, bbox, callback):
+
+        self._bbox = bbox
+        self.callback = callback
+
+        self.count = 0
+
+        self.cells = []
+
+        self.reset()
+
+    def reset(self):
+        self.index = 0
+
+    def bbox(self):
+        return self._bbox
+
+    def instance(self):
+        cell = self.callback(self.count, self.index)
+        ref = gdspy.CellReference(cell)
+
+        self.cells.append(cell)
+
+        self.index += 1
+        self.count += 1
+
+        return ref
