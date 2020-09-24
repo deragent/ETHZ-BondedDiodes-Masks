@@ -64,17 +64,15 @@ def main(args):
     ymax = 50300
 
     DIODE_CONFIGS = [
-        ['DIODE_15mm', 15000, 3000, 'A', 16300],
-        ['DIODE_12mm', 12000, 3000, 'B', 13300],
-        ['DIODE_8mm', 8000, 2000, 'C', 9300],
-        ['DIODE_6mm', 6000, 2000, 'D', 7300],
-        ['DIODE_4mm', 4000, 1000, 'E', 5300],
-        ['DIODE_2mm', 2000, 1000, 'F', 3300],
+        ['DIODE_15mm', 15000, 3000, 'A'],
+        ['DIODE_12mm', 12000, 3000, 'B'],
+        ['DIODE_8mm', 8000, 2000, 'C'],
+        ['DIODE_6mm', 6000, 2000, 'D'],
+        ['DIODE_4mm', 4000, 1000, 'E'],
+        ['DIODE_2mm', 2000, 1000, 'F'],
     ]
 
     for ii, config in enumerate(DIODE_CONFIGS):
-
-        x = xoffset + config[4]/2
 
         def createDiode(count, index):
             label = config[3] + str(count)
@@ -89,6 +87,10 @@ def main(args):
 
         generator = CallbackGenerator(createDiode)
 
+
+        x = xoffset + generator.width()/2
+
+
         column_r = DeviceColumn(diodes, 'COLUMN_R_%s'%(config[0]), generator,
             x, ymin[ii], min(-1*ymin[ii], ymax),
             margin=margin, dicingwidth=dicingwidth, keepout=keepouts)
@@ -102,7 +104,8 @@ def main(args):
 
         generator.addCellsToLib(lib)
 
-        xoffset += config[4] + 2*margin
+
+        xoffset += generator.width() + 2*margin
 
     top_dicing = DicingLine(GC.GLOBAL["LAYERS"]["DICING"], diodes,
         dicingwidth, (-48400, 50500), (48400, 50500))
