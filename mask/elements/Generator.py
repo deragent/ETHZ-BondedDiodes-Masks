@@ -14,6 +14,14 @@ class Generator():
     def reset(self):
         raise NotImplementedError
 
+    def width(self):
+        bbox = self.bbox()
+        return bbox[1,0] - bbox[0,0]
+
+    def height(self):
+        bbox = self.bbox()
+        return bbox[1,1] - bbox[0,1]
+
 
 class ReferenceGenerator(Generator):
 
