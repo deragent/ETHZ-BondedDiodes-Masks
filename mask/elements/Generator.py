@@ -59,9 +59,7 @@ class ReferenceGenerator(Generator):
 
 class CallbackGenerator(Generator):
 
-    def __init__(self, bbox, callback):
-
-        self._bbox = bbox
+    def __init__(self, callback):
         self.callback = callback
 
         self.count = 0
@@ -74,7 +72,11 @@ class CallbackGenerator(Generator):
         self.index = 0
 
     def bbox(self):
-        return self._bbox
+        ref = self.instance()
+        bbox = ref.get_bounding_box()
+        self.retract()
+
+        return bbox
 
     def instance(self):
         cell = self.callback(self.count, self.index)

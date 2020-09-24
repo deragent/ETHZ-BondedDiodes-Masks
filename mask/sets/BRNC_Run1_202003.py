@@ -87,8 +87,7 @@ def main(args):
 
             return element.cell
 
-        bbox = np.array([ [-config[4]/2, -config[4]/2], [config[4]/2, config[4]/2] ])
-        generator = CallbackGenerator(bbox, createDiode)
+        generator = CallbackGenerator(createDiode)
 
         column_r = DeviceColumn(diodes, 'COLUMN_R_%s'%(config[0]), generator,
             x, ymin[ii], min(-1*ymin[ii], ymax),
