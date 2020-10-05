@@ -8,7 +8,9 @@ class ExportSpecs():
         self.alwayslayers = []
 
     def add(self, name, layer):
-        self.exportlayers[name] = layer["layer"]
+        if name not in self.exportlayers:
+            self.exportlayers[name] = []
+        self.exportlayers[name].append(layer["layer"])
 
     def always(self, layer):
         self.alwayslayers.append(layer["layer"])
@@ -24,6 +26,6 @@ class ExportSpecs():
             raise
 
         layers = copy.copy(self.alwayslayers)
-        layers.append(self.exportlayers[key])
+        layers.extend(self.exportlayers[key])
 
         return key, layers
