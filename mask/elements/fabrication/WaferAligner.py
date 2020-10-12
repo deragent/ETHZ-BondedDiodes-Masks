@@ -5,7 +5,7 @@ from .. import Element
 
 class WaferAligner(Element):
 
-    def __init__(self, parent, name, xy, layer, size=1000, inverted=True, margin=3000, layers=None, lib=None):
+    def __init__(self, parent, name, xy, layer, size=1000, inverted=True, margin=1500, layers=None, lib=None):
 
         self.xy = xy
 
