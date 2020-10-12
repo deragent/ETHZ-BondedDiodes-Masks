@@ -5,6 +5,7 @@ from .. import config
 
 from ..elements.fabrication import MarkerField
 from ..elements.fabrication import WaferAligner
+from ..elements.fabrication import WaferFlatAligner
 
 ## Define the layers
 
@@ -87,5 +88,8 @@ def createWaferAlignment(lib):
 
     markers.add(marker_br.cell)
     markers.add(marker_bl.cell)
+
+    marker_flat = WaferFlatAligner(lib, 'WAFER_MARKER_FLAT', RADIUS*2, 57500, 'ALIGNMENT_MARKS', inverted=True)
+    markers.add(marker_flat.cell)
 
     return markers
