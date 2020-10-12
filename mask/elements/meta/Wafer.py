@@ -1,22 +1,29 @@
+import math
+
 import gdspy
 
 from .. import Element
 
 class Wafer(Element):
 
-    def __init__(self, parent, name, size, margin=5000, layers=None, lib=None):
+    def __init__(self, parent, name, size, margin=5000, flat=57500, layers=None, lib=None):
 
         self.size = size
         self.margin = margin
-        
+
+        self.flat = flat
+
         super().__init__(parent, name, layers, lib)
 
     def construct(self):
 
-        flat_cut = 8000
+        r = self.size/2
+        f2 = self.flat/2
 
-        round = gdspy.Round((0, 0), self.size/2, tolerance=10)
-        flat = gdspy.Rectangle((-self.size/2, -self.size/2*1.1), (self.size/2, -self.size/2 + flat_cut))
+        bottom = math.sqrt(r**2 - f2**2)
+
+        round = gdspy.Round((0, 0), r, tolerance=10)
+        flat = gdspy.Rectangle((-r, -r*1.1), (r, -bottom))
 
         outline = gdspy.boolean(round, flat, 'not', **self.layers["WAFER_OUTLINE"])
 

@@ -31,7 +31,7 @@ def main(args):
 
 
     ### Create meta cells
-    wafer = Wafer(top, 'WAFER', 150000)
+    wafer = Wafer(top, 'WAFER', 150000, flat=57500)
     mask = Mask(top, 'MASK', 7*25400, {
             "DATE": "2020-03-12",
             "USER": "jorich",
