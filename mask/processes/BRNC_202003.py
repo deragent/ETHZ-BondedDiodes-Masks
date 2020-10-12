@@ -4,6 +4,7 @@ import math
 from .. import config
 
 from ..elements.fabrication import MarkerField
+from ..elements.fabrication import WaferAligner
 
 ## Define the layers
 
@@ -59,3 +60,32 @@ def createMarkers(lib):
     keepouts = [marker_left.get_bounding_box(), marker_right.get_bounding_box()]
 
     return markers, keepouts
+
+
+def createWaferAlignment(lib):
+
+    markers = lib.new_cell('WAFER_MARKERS')
+
+    RADIUS = 150000/2
+
+    # Top Markers
+    y = 25000
+    x = math.sqrt(RADIUS**2 - y**2)
+
+    marker_tr = WaferAligner(lib, 'WAFER_MARKER_TR', (x, y), 'ALIGNMENT_MARKS')
+    marker_tl = WaferAligner(lib, 'WAFER_MARKER_TL', (-x, y), 'ALIGNMENT_MARKS')
+
+    markers.add(marker_tr.cell)
+    markers.add(marker_tl.cell)
+
+    # Bottom Markers
+    y = RADIUS/2
+    x = math.sqrt(RADIUS**2 - y**2)
+
+    marker_br = WaferAligner(lib, 'WAFER_MARKER_BR', (x, -y), 'ALIGNMENT_MARKS')
+    marker_bl = WaferAligner(lib, 'WAFER_MARKER_BL', (-x, -y), 'ALIGNMENT_MARKS')
+
+    markers.add(marker_br.cell)
+    markers.add(marker_bl.cell)
+
+    return markers

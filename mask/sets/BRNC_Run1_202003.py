@@ -43,6 +43,10 @@ def main(args):
     markers, keepouts = BRNC_202003.createMarkers(lib)
     top.add(markers)
 
+    ### Add Wafer Markers
+    wafer_markers = BRNC_202003.createWaferAlignment(lib)
+    top.add(wafer_markers)
+
 
 
     ### Create diode cells
