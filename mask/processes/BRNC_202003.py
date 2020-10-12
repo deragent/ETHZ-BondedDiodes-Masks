@@ -50,10 +50,10 @@ def createMarkers(lib):
     ])
 
 
-    marker_left = gdspy.CellReference(field.cell, origin=(-35000, 0))
+    marker_left = gdspy.CellReference(field.cell, origin=(-55000, 0))
     markers.add(marker_left)
 
-    marker_right = gdspy.CellReference(field.cell, origin=(+35000, 0), x_reflection=True, rotation=180)
+    marker_right = gdspy.CellReference(field.cell, origin=(+55000, 0), x_reflection=True, rotation=180)
     markers.add(marker_right)
 
     keepouts = [marker_left.get_bounding_box(), marker_right.get_bounding_box()]
