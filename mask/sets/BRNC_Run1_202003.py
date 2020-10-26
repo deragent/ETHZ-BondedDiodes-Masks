@@ -48,74 +48,81 @@ def main(args):
     top.add(wafer_markers)
 
 
+    if args.side != 'P':
 
-    ### Create diode cells
-    diodes = lib.new_cell('DIODES')
+        ### Create diode cells
+        diodes = lib.new_cell('DIODES')
 
-    LABEL_HEIGHT = 300
+        LABEL_HEIGHT = 300
 
-    ADD_LABEL = (args.side == 'N')
+        ADD_LABEL = (args.side == 'N')
 
-    margin = 150
-    dicingwidth = 100
+        margin = 150
+        dicingwidth = 100
 
-    xoffset = margin
+        xoffset = margin
 
-    ymin = [-61500, -61500, -57000, -51000, -45000, -40500]
-    ymax = 50300
+        ymin = [-61500, -61500, -57000, -51000, -45000, -40500]
+        ymax = 50300
 
-    DIODE_CONFIGS = [
-        ['DIODE_15mm', 15000, 3000, 'A'],
-        ['DIODE_12mm', 12000, 3000, 'B'],
-        ['DIODE_8mm', 8000, 2000, 'C'],
-        ['DIODE_6mm', 6000, 2000, 'D'],
-        ['DIODE_4mm', 4000, 1000, 'E'],
-        ['DIODE_2mm', 2000, 1000, 'F'],
-    ]
+        DIODE_CONFIGS = [
+            ['DIODE_15mm', 15000, 3000, 'A'],
+            ['DIODE_12mm', 12000, 3000, 'B'],
+            ['DIODE_8mm', 8000, 2000, 'C'],
+            ['DIODE_6mm', 6000, 2000, 'D'],
+            ['DIODE_4mm', 4000, 1000, 'E'],
+            ['DIODE_2mm', 2000, 1000, 'F'],
+        ]
 
-    for ii, config in enumerate(DIODE_CONFIGS):
+        for ii, config in enumerate(DIODE_CONFIGS):
 
-        def createDiode(count, index):
-            if ADD_LABEL:
-                label = (config[3] + str(count), LABEL_HEIGHT)
-            else:
-                label = None
+            def createDiode(count, index):
+                if ADD_LABEL:
+                    label = (config[3] + str(count), LABEL_HEIGHT)
+                else:
+                    label = None
 
-            name = config[0] + '_%i'%(count)
-            window = config[2] if (index % 3) == 2 else 0
+                name = config[0] + '_%i'%(count)
+                window = config[2] if (index % 3) == 2 else 0
 
-            element = Diode(None, name, config[1],
-                            rounding=(config[1]/10), window=window,
-                            label=label)
+                element = Diode(None, name, config[1],
+                                rounding=(config[1]/10), window=window,
+                                label=label)
 
-            return element.cell
+                return element.cell
 
-        generator = CallbackGenerator(createDiode)
-
-
-        x = xoffset + generator.width()/2
+            generator = CallbackGenerator(createDiode)
 
 
-        column_r = DeviceColumn(diodes, 'COLUMN_R_%s'%(config[0]), generator,
-            x, ymin[ii], min(-1*ymin[ii], ymax),
-            margin=margin, dicingwidth=dicingwidth, keepout=keepouts)
-
-        generator.reset()
-
-        column_l = DeviceColumn(diodes, 'COLUMN_L_%s'%(config[0]), generator,
-            -1*x, ymin[ii], min(-1*ymin[ii], ymax),
-            margin=margin, dicingwidth=dicingwidth, keepout=keepouts)
+            x = xoffset + generator.width()/2
 
 
-        generator.addCellsToLib(lib)
+            column_r = DeviceColumn(diodes, 'COLUMN_R_%s'%(config[0]), generator,
+                x, ymin[ii], min(-1*ymin[ii], ymax),
+                margin=margin, dicingwidth=dicingwidth, keepout=keepouts)
+
+            generator.reset()
+
+            column_l = DeviceColumn(diodes, 'COLUMN_L_%s'%(config[0]), generator,
+                -1*x, ymin[ii], min(-1*ymin[ii], ymax),
+                margin=margin, dicingwidth=dicingwidth, keepout=keepouts)
 
 
-        xoffset += generator.width() + 2*margin
+            generator.addCellsToLib(lib)
 
-    top_dicing = DicingLine(GC.GLOBAL["LAYERS"]["DICING"], diodes,
-        dicingwidth, (-48400, 50500), (48400, 50500))
 
-    top.add(diodes)
+            xoffset += generator.width() + 2*margin
+
+        top_dicing = DicingLine(GC.GLOBAL["LAYERS"]["DICING"], diodes,
+            dicingwidth, (-48400, 50500), (48400, 50500))
+
+        top.add(diodes)
+
+    else:
+
+        # Create the flood backside doping and metalization
+
+        pass # TODO
 
     ## Add test structures (VPD + TLM)
     testset = Run1_TestSet(lib)
