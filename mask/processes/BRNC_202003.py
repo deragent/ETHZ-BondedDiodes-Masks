@@ -6,6 +6,7 @@ from .. import config
 from ..elements.fabrication import MarkerField
 from ..elements.fabrication import WaferAligner
 from ..elements.fabrication import WaferFlatAligner
+from ..forms import Ring
 
 ## Define the layers
 
@@ -65,31 +66,43 @@ def createMarkers(lib):
 
 def createWaferAlignment(lib):
 
+    layer = config.GLOBAL["LAYERS"]["ALIGNMENT_MARKS"]
+
     markers = lib.new_cell('WAFER_MARKERS')
 
     RADIUS = 150000/2
+
+    outline_cell = lib.new_cell('WAFER_OUTLINE')
+    outline = Ring(layer, outline_cell, RADIUS - 3000, RADIUS + 3000, flat=60000)
+
+    polygons = outline_cell.get_polygons()
 
     # Top Markers
     y = 25000
     x = math.sqrt(RADIUS**2 - y**2)
 
-    marker_tr = WaferAligner(lib, 'WAFER_MARKER_TR', (x, y), 'ALIGNMENT_MARKS')
-    marker_tl = WaferAligner(lib, 'WAFER_MARKER_TL', (-x, y), 'ALIGNMENT_MARKS')
+    marker_tr = WaferAligner(None, 'WAFER_MARKER_TR', (x, y), 'ALIGNMENT_MARKS', inverted=False)
+    marker_tl = WaferAligner(None, 'WAFER_MARKER_TL', (-x, y), 'ALIGNMENT_MARKS', inverted=False)
 
-    markers.add(marker_tr.cell)
-    markers.add(marker_tl.cell)
+    polygons = gdspy.boolean(polygons, marker_tr.cell.get_polygons(), 'not', **layer)
+    polygons = gdspy.boolean(polygons, marker_tl.cell.get_polygons(), 'not', **layer)
 
     # Bottom Markers
     y = RADIUS/2
     x = math.sqrt(RADIUS**2 - y**2)
 
-    marker_br = WaferAligner(lib, 'WAFER_MARKER_BR', (x, -y), 'ALIGNMENT_MARKS')
-    marker_bl = WaferAligner(lib, 'WAFER_MARKER_BL', (-x, -y), 'ALIGNMENT_MARKS')
+    marker_br = WaferAligner(None, 'WAFER_MARKER_BR', (x, -y), 'ALIGNMENT_MARKS', inverted=False)
+    marker_bl = WaferAligner(None, 'WAFER_MARKER_BL', (-x, -y), 'ALIGNMENT_MARKS', inverted=False)
 
-    markers.add(marker_br.cell)
-    markers.add(marker_bl.cell)
+    polygons = gdspy.boolean(polygons, marker_br.cell.get_polygons(), 'not', **layer)
+    polygons = gdspy.boolean(polygons, marker_bl.cell.get_polygons(), 'not', **layer)
 
-    marker_flat = WaferFlatAligner(lib, 'WAFER_MARKER_FLAT', RADIUS*2, 57500, 'ALIGNMENT_MARKS', inverted=True)
-    markers.add(marker_flat.cell)
+    marker_flat = WaferFlatAligner(
+        None, 'WAFER_MARKER_FLAT', RADIUS*2, 57500, 'ALIGNMENT_MARKS',
+        inverted=False
+    )
+    polygons = gdspy.boolean(polygons, marker_flat.cell.get_polygons(), 'not', **layer)
+
+    markers.add(polygons)
 
     return markers
