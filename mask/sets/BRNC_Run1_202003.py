@@ -56,12 +56,12 @@ def main(args):
 
     ADD_LABEL = (args.side == 'N')
 
-    margin = 350
+    margin = 150
     dicingwidth = 100
 
     xoffset = margin
 
-    ymin = [-61500, -61500, -56000, -49000, -42000, -36500]
+    ymin = [-61500, -61500, -57000, -51000, -45000, -40500]
     ymax = 50300
 
     DIODE_CONFIGS = [
