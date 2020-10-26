@@ -16,7 +16,7 @@ from mask.elements.electrical import Diode
 from mask.elements.meta import Wafer
 from mask.elements.meta import Mask
 from mask.elements.fabrication import MarkerCoarse, DeviceColumn
-from mask.forms import DicingLine
+from mask.forms import DicingLine, Flood
 from mask.elements import CallbackGenerator
 
 
@@ -121,8 +121,16 @@ def main(args):
     else:
 
         # Create the flood backside doping and metalization
+        backside = lib.new_cell('BACKSIDE')
 
-        pass # TODO
+        for layer_name in ["CONTACT_DOPING", "METALIZATION"]:
+            flood = Flood(
+                GC.GLOBAL["LAYERS"][layer_name], backside,
+                (-58000, -63000), (+58000, +50500),
+                radius=140000/2 , keepout=keepouts
+            )
+
+        top.add(backside)
 
     ## Add test structures (VPD + TLM)
     testset = Run1_TestSet(lib)
