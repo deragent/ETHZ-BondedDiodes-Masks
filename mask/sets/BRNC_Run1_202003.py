@@ -126,7 +126,7 @@ def main(args):
         for layer_name in ["CONTACT_DOPING", "METALIZATION"]:
             flood = Flood(
                 GC.GLOBAL["LAYERS"][layer_name], backside,
-                (-58000, -63000), (+58000, +50500),
+                (-59000, -63000), (+59000, +50500),
                 radius=140000/2 , keepout=keepouts
             )
 
