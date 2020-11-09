@@ -27,6 +27,7 @@ class Mask(Element):
         self.cell.add(gdspy.CellReference(self.namecell))
 
         self._constructFrame()
+        self._constructCorners()
 
         if len(self.text) > 0:
             self._constructLabel()
@@ -57,6 +58,15 @@ class Mask(Element):
 
         self.cell.add(outline)
 
+    def _constructCorners(self):
+
+        p = self.size/2 - 1.2*self.margin
+        w = 0.4*self.margin
+
+        for x in [-p, p-w]:
+            for y in [-p, p-w]:
+                rect = gdspy.Rectangle((x, y), (x+w, y+w), **self.layers["MASK_CORNERS"])
+                self.cell.add(rect)
 
     def _constructLabel(self):
 
