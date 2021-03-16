@@ -24,3 +24,8 @@ class Wafer(Element):
             self.layers["WAFER_OUTLINE"], self.cell,
             r-self.margin, r, flat=self.flat
         )
+
+        border = Ring(
+            self.layers["WAFER_BORDER"], self.cell,
+            r-100, r, flat=self.flat
+        )

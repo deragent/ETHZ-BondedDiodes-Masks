@@ -10,6 +10,7 @@ from ..forms import Ring
 
 ## Define the layers
 
+config.GLOBAL["LAYERS"]["WAFER_BORDER"] = (51, 1)
 config.GLOBAL["LAYERS"]["WAFER_OUTLINE"] = (52, 1)
 
 config.GLOBAL["LAYERS"]["DICING"] = (53, 4)
