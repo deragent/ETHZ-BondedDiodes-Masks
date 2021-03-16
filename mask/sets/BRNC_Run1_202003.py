@@ -11,6 +11,7 @@ from mask.processes import BRNC_202003
 from mask.macros import Run1_TestSet
 
 from mask.tools import MaskMerge
+from mask.tools import Outline
 
 from mask.elements.electrical import Diode
 from mask.elements.meta import Wafer
@@ -28,6 +29,9 @@ def main(args):
     GC.GLOBAL["LIB"] = lib
 
     top = lib.new_cell('TOP_CELL')
+
+
+    outline = Outline(150000, flat=57500)
 
 
     ### Create meta cells
@@ -74,6 +78,8 @@ def main(args):
             ['DIODE_2mm', 2000, 1000, 'F'],
         ]
 
+        TOP_DICING_Y = 50500
+
         for ii, config in enumerate(DIODE_CONFIGS):
 
             def createDiode(count, index):
@@ -96,10 +102,14 @@ def main(args):
 
             x = xoffset + generator.width()/2
 
+            dicinglines = []
 
             column_r = DeviceColumn(diodes, 'COLUMN_R_%s'%(config[0]), generator,
                 x, ymin[ii], min(-1*ymin[ii], ymax),
                 margin=margin, dicingwidth=dicingwidth, keepout=keepouts)
+
+            dicinglines.append(column_r.cell.get_bounding_box()[1][0])
+            dicinglines.append(column_r.cell.get_bounding_box()[0][0])
 
             generator.reset()
 
@@ -107,14 +117,28 @@ def main(args):
                 -1*x, ymin[ii], min(-1*ymin[ii], ymax),
                 margin=margin, dicingwidth=dicingwidth, keepout=keepouts)
 
+            dicinglines.append(column_l.cell.get_bounding_box()[1][0])
+            dicinglines.append(column_l.cell.get_bounding_box()[0][0])
+
 
             generator.addCellsToLib(lib)
 
 
+            # Add vertical dicing lines from the wafer edge
+            for pos in dicinglines:
+                ystart = outline.yMaxAtX(pos)
+                if ystart > TOP_DICING_Y:
+                    ystart = TOP_DICING_Y
+
+                line = DicingLine(GC.GLOBAL["LAYERS"]["DICING"], diodes,
+                    dicingwidth, (pos, ystart), (pos, outline.yMinAtX(pos)))
+
+
             xoffset += generator.width() + 2*margin
 
+        # Horizontal dicing line to separate the top test structures
         top_dicing = DicingLine(GC.GLOBAL["LAYERS"]["DICING"], diodes,
-            dicingwidth, (-48400, 50500), (48400, 50500))
+            dicingwidth, (outline.xMinAtY(TOP_DICING_Y), TOP_DICING_Y), (outline.xMaxAtY(TOP_DICING_Y), TOP_DICING_Y))
 
         top.add(diodes)
 
