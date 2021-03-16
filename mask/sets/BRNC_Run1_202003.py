@@ -181,6 +181,10 @@ def main(args):
 
             out.write_gds(args.export + "/%s.gds"%(name))
 
+            ### Save and svg representation
+            style = {(GC.GLOBAL["LAYERS"][name]["layer"], GC.GLOBAL["LAYERS"][name]["datatype"]): {'fill': '#FFFFFF'}}
+            out.top_level()[0].write_svg(args.export + "/%s.svg"%(name), 0.02, style=style)
+
 
 if __name__ == "__main__":
 
