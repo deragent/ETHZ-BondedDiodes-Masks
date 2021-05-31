@@ -8,11 +8,12 @@ class Mask(Element):
 
     T_HEIGHT = 2000
 
-    def __init__(self, parent, name, size, text, margin=4000, layers=None, lib=None, githash=False):
+    def __init__(self, parent, name, size, text, margin=4000, textheight=2000, layers=None, lib=None, githash=False):
 
         self.size = size
         self.margin = margin
         self.text = text
+        self.textheight=textheight
 
         if githash:
             import git
@@ -76,7 +77,7 @@ class Mask(Element):
         textcell = self.lib.new_cell(self.name + '_LABEL')
 
         label = TextList(self.layers["MASK_LABEL"], textcell,
-            self.text, height=2000, origin=(x0, y0))
+            self.text, height=self.textheight, origin=(x0, y0))
 
         self.cell.add(textcell)
 
@@ -92,6 +93,6 @@ class Mask(Element):
         if len(name) > 0:
             namelabel = TextList(
                 self.layers["MASK_NAME"], self.namecell,
-                {name: ''}, height=2000,
+                {name: ''}, height=self.textheight,
                 origin=(0, -self.size/2 + 2.5*self.margin)
             )
