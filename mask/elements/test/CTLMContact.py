@@ -8,6 +8,7 @@ class CTLMContact(Element):
     def __init__(self, parent, name,
         gaps, grid,
         radius_i=100, size=400,
+        with_contact_implant=True,
         layers=None, lib=None):
 
         self.gaps = gaps
@@ -21,6 +22,8 @@ class CTLMContact(Element):
         self.radius_i = radius_i
         self.size = size
 
+        self.with_contact_implant = with_contact_implant
+
         super().__init__(parent, name, layers, lib)
 
 
@@ -33,11 +36,12 @@ class CTLMContact(Element):
         gt = gx*gy
 
         th = s*(2*gy)
-        tw = s*(3*gx + 1)
+        tw = s*(2*gx + 1)
 
 
-        implant = gdspy.Rectangle((-tw/2, -th/2), (tw/2, th/2), **self.layers["CONTACT_DOPING"])
-        self.cell.add(implant)
+        if self.with_contact_implant:
+            implant = gdspy.Rectangle((-tw/2, -th/2), (tw/2, th/2), **self.layers["CONTACT_DOPING"])
+            self.cell.add(implant)
 
         metal = gdspy.Rectangle((-tw/2, -th/2), (tw/2, th/2), **self.layers["METALIZATION"])
 
@@ -62,6 +66,6 @@ class CTLMContact(Element):
                 y += 2*s
                 x = x_start
             else:
-                x += 3*s
+                x += 2*s
 
         self.cell.add(metal)
