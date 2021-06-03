@@ -8,7 +8,7 @@ gdspy.library.use_current_library = False
 
 from mask import config as GC
 from mask.processes import BRNC_202105
-from mask.macros import Run1_TestSet
+from mask.macros import Run2_TestSet
 
 from mask.tools import MaskMerge
 from mask.tools import Outline
@@ -156,11 +156,13 @@ def main(args):
         top.add(backside)
 
     ## Add test structures (VPD + TLM)
-    # testset = Run1_TestSet(lib)
-    #
-    # top.add(gdspy.CellReference(testset, rotation=90, origin=(-63000, -5000)))
-    # top.add(gdspy.CellReference(testset, rotation=-90, origin=(+63000, +5000)))
-    # top.add(gdspy.CellReference(testset, rotation=0, origin=(-5000, +63000)))
+    testset_vert, testset_hor = Run2_TestSet(lib)
+
+    top.add(gdspy.CellReference(testset_vert, rotation=180, origin=(+42500, -11000), x_reflection=True))
+    top.add(gdspy.CellReference(testset_vert, rotation=0, origin=(-42500, -11000)))
+
+    top.add(gdspy.CellReference(testset_hor, rotation=180, origin=(+32500, +31000), x_reflection=True))
+    top.add(gdspy.CellReference(testset_hor, rotation=0, origin=(-32500, +31000)))
 
 
     ### Save the gds file
