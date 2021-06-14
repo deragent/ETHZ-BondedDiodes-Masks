@@ -5,3 +5,4 @@
 ### Python Libraries
 - gdspy
 - rich
+- gitpython
