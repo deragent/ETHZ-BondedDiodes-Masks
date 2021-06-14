@@ -101,14 +101,13 @@ def main(args):
 
             x = xoffset + generator.width()/2
 
-            dicinglines = []
+            dicinglines = [0]
 
             column_r = DeviceColumn(diodes, 'COLUMN_R_%s'%(config[0]), generator,
                 x, ymin[ii], min(-1*ymin[ii], ymax),
                 margin=margin, dicingwidth=dicingwidth, keepout=keepouts)
 
             dicinglines.append(column_r.cell.get_bounding_box()[1][0])
-            dicinglines.append(column_r.cell.get_bounding_box()[0][0])
 
             generator.reset()
 
@@ -116,7 +115,6 @@ def main(args):
                 -1*x, ymin[ii], min(-1*ymin[ii], ymax),
                 margin=margin, dicingwidth=dicingwidth, keepout=keepouts)
 
-            dicinglines.append(column_l.cell.get_bounding_box()[1][0])
             dicinglines.append(column_l.cell.get_bounding_box()[0][0])
 
 
@@ -128,6 +126,8 @@ def main(args):
                 ystart = outline.yMaxAtX(pos)
                 if ystart > TOP_DICING_Y:
                     ystart = TOP_DICING_Y
+
+                pos = pos - math.copysign(dicingwidth/2, pos)
 
                 line = DicingLine(GC.GLOBAL["LAYERS"]["DICING"], diodes,
                     dicingwidth, (pos, ystart), (pos, outline.yMinAtX(pos)))
