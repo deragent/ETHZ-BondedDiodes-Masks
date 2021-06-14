@@ -13,3 +13,5 @@ from .TextList import TextList
 from .Ring import Ring
 
 from .Flood import Flood
+
+from .ScaleBar import ScaleBarVertical
