@@ -19,3 +19,5 @@ from .ScaleBar import ScaleBarVertical
 from .Wheel import Wheel
 
 from .Stripes import Stripes
+
+from .ChessBoard import ChessBoard
