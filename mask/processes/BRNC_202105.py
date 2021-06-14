@@ -104,8 +104,7 @@ def createWaferAlignment(lib):
     polygons = gdspy.boolean(polygons, marker_bl.cell.get_polygons(), 'not', **layer)
 
     marker_flat = WaferFlatAligner(
-        None, 'WAFER_MARKER_FLAT', RADIUS*2, 32500, 'ALIGNMENT_MARKS',
-        inverted=False
+        None, 'WAFER_MARKER_FLAT', RADIUS*2, 32500, 'ALIGNMENT_MARKS'
     )
     polygons = gdspy.boolean(polygons, marker_flat.cell.get_polygons(), 'not', **layer)
 
