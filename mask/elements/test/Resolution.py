@@ -5,6 +5,7 @@ from .. import Element
 
 from ...forms import Wheel
 from ...forms import Stripes
+from ...forms import ChessBoard
 
 class Resolution(Element):
 
@@ -34,18 +35,35 @@ class Resolution(Element):
             origin=(-tw/2 + cw/2, -tw/2 + cw/2)
         )
 
+
         # Add N-times Chess Board
+        mult = 1
+        for x in [cw/4, 3*cw/4]:
+            for y in [cw/4, 3*cw/4]:
+                size = mult*cd
+                N = math.floor(cw/3 / size)
+
+                chess = ChessBoard(
+                    l, self.cell,
+                    size, N=(N, N),
+                    origin=(tw/2 - x, tw/2 - y)
+                )
+
+                mult *= 2
+
+
+        # Add stripes
         stripes = [cd*n/5 for n in range(1, 11)]
         N = 8
 
         maxw = (2*N-1)*max(stripes)
 
-        # Add Horizontal stripes
         x = -tw/2
         y = tw/2 - cw/4
         for ww, width in enumerate(stripes):
 
             x+= N*width
+
 
             strip = Stripes(
                 l, self.cell,
@@ -53,17 +71,15 @@ class Resolution(Element):
                 origin=(x, y)
             )
 
+            # Add vertical stripes
             strip = Stripes(
                 l, self.cell,
                 height=cw/3, strip=width, N=N,
                 origin=(y, x), angle=math.pi/2
             )
 
+            # Add Horizontal stripes
             x += N*width + cd*15
             if x>=-20*cd:
                 x = -tw/2
                 y = tw/2 - 3*cw/4
-
-        # Add vertical stripes
-
-        # Maybe: Add crosses
