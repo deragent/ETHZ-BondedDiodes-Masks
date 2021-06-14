@@ -27,11 +27,11 @@ def Run2_TestSet(lib):
 
     vdp_metal = VanDerPauwMetal(
         lib, 'VDPMetal',
-        contactw=CONTACT, contactspacing=SPACING
+        contactw=CONTACT*2, contactspacing=SPACING*1.5
     )
     vdp_contact = VanDerPauwContact(
         lib, 'VDPContact',
-        contactw=CONTACT, contactspacing=SPACING, overhang=OVERHANG
+        contactw=CONTACT*2, contactspacing=SPACING*1.5, overhang=OVERHANG
     )
 
     resolution_metal = Resolution(
