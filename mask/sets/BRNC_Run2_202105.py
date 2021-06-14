@@ -127,7 +127,8 @@ def main(args):
                 if ystart > TOP_DICING_Y:
                     ystart = TOP_DICING_Y
 
-                pos = pos - math.copysign(dicingwidth/2, pos)
+                if pos != 0:
+                    pos = pos - math.copysign(dicingwidth/2, pos)
 
                 line = DicingLine(GC.GLOBAL["LAYERS"]["DICING"], diodes,
                     dicingwidth, (pos, ystart), (pos, outline.yMinAtX(pos)))
