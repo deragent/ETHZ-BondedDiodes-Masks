@@ -1,6 +1,6 @@
 import gdspy
 
-from mask.elements.test import VanDerPauwMetal, VanDerPauwContact, CTLMContact
+from mask.elements.test import VanDerPauwMetal, VanDerPauwContact, CTLMContact, Resolution
 
 CONTACT = 100
 OVERHANG = 10
@@ -34,6 +34,15 @@ def Run2_TestSet(lib):
         contactw=CONTACT, contactspacing=SPACING, overhang=OVERHANG
     )
 
+    resolution_metal = Resolution(
+        lib, 'RESMetal',
+        layer='METALIZATION', critical_dimension=5
+    )
+    resolution_implant = Resolution(
+        lib, 'RESImplant',
+        layer='CONTACT_DOPING', critical_dimension=5
+    )
+
     ## Vertical
     y = 0
     testset_vert.add(gdspy.CellReference(ctlm_none.cell,
@@ -50,7 +59,15 @@ def Run2_TestSet(lib):
     testset_vert.add(gdspy.CellReference(vdp_metal.cell, origin=(-(vdp_metal.width+SPACING)/2, y)))
     testset_vert.add(gdspy.CellReference(vdp_contact.cell, origin=(+(vdp_contact.width+SPACING)/2, y)))
 
-    y +=  vdp_metal.height+400
+    y +=  vdp_metal.height/2 + SPACING
+
+    y += resolution_metal.height/2
+
+    testset_vert.add(gdspy.CellReference(resolution_metal.cell, origin=(-(resolution_metal.width+SPACING)/2, y)))
+    testset_vert.add(gdspy.CellReference(resolution_implant.cell, origin=(+(resolution_implant.width+SPACING)/2, y)))
+
+    y += resolution_metal.height/2 + SPACING
+
 
     ## Horizontal
     x = 0
@@ -68,7 +85,15 @@ def Run2_TestSet(lib):
     testset_hor.add(gdspy.CellReference(vdp_metal.cell, origin=(x, -(vdp_metal.height+SPACING)/2)))
     testset_hor.add(gdspy.CellReference(vdp_contact.cell, origin=(x, +(vdp_contact.height+SPACING)/2)))
 
-    x +=  vdp_metal.width+400
+    x +=  vdp_metal.width/2 + SPACING
+
+    x += resolution_metal.width/2
+    testset_hor.add(gdspy.CellReference(resolution_metal.cell, origin=(x, 0)))
+    x += resolution_metal.width/2 + SPACING
+
+    x += resolution_implant.width/2
+    testset_hor.add(gdspy.CellReference(resolution_implant.cell, origin=(x, 0)))
+    x += resolution_implant.width/2 + SPACING
 
 
     return testset_vert, testset_hor
