@@ -15,3 +15,7 @@ from .Ring import Ring
 from .Flood import Flood
 
 from .ScaleBar import ScaleBarVertical
+
+from .Wheel import Wheel
+
+from .Stripes import Stripes

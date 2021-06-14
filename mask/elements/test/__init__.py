@@ -5,3 +5,5 @@ from .CTLMContact import CTLMContact
 
 from .VanDerPauw import VanDerPauwMetal
 from .VanDerPauw import VanDerPauwContact
+
+from .Resolution import Resolution
