@@ -8,7 +8,7 @@ gdspy.library.use_current_library = False
 
 from mask import config as GC
 from mask.processes import BRNC_202105
-from mask.macros import Run2_TestSet
+from mask.macros import Run2_TestSet, Run1_TestSet
 
 from mask.tools import MaskMerge
 from mask.tools import Outline
@@ -164,6 +164,13 @@ def main(args):
 
     top.add(gdspy.CellReference(testset_hor, rotation=180, origin=(+32500, +31000), x_reflection=True))
     top.add(gdspy.CellReference(testset_hor, rotation=0, origin=(-32500, +31000)))
+
+    # Add old linear TLM as a reference
+    testset_old = Run1_TestSet(lib)
+
+    top.add(gdspy.CellReference(testset_old, origin=(-10000, 41500)))
+
+
 
 
     ### Save the gds file

@@ -26,20 +26,20 @@ def Run2_TestSet(lib):
     )
 
     vdp_metal = VanDerPauwMetal(
-        lib, 'VDPMetal',
+        lib, 'VDPMetal_Run2',
         contactw=CONTACT*2, contactspacing=SPACING*1.5
     )
     vdp_contact = VanDerPauwContact(
-        lib, 'VDPContact',
+        lib, 'VDPContact_Run2',
         contactw=CONTACT*2, contactspacing=SPACING*1.5, overhang=OVERHANG
     )
 
     resolution_metal = Resolution(
-        lib, 'RESMetal',
+        lib, 'RESMetal_Run2',
         layer='METALIZATION', critical_dimension=5
     )
     resolution_implant = Resolution(
-        lib, 'RESImplant',
+        lib, 'RESImplant_Run2',
         layer='CONTACT_DOPING', critical_dimension=5
     )
 
