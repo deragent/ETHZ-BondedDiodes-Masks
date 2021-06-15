@@ -172,6 +172,19 @@ def main(args):
 
 
 
+    ## Add text ident
+    title_text = gdspy.Text(
+        "ETHZ - IPA\nRubbia Group\nSensor Project\nSimple Bonded Diodes - Run 2", 700,
+        position=(-43500, 3000), angle=0.5*math.pi, **GC.GLOBAL["LAYERS"]["METALIZATION"]
+    )
+    top.add(title_text)
+
+    author_text = gdspy.Text(
+        "Johannes Wuethrich\nJune 2021", 700,
+        position=(+42000, 3000), angle=0.5*math.pi, **GC.GLOBAL["LAYERS"]["METALIZATION"]
+    )
+    top.add(author_text)
+
 
     ### Save the gds file
     lib.write_gds(args.output)
