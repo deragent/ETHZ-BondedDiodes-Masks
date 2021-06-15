@@ -13,7 +13,7 @@ from mask.macros import Run2_TestSet, Run1_TestSet
 from mask.tools import MaskMerge
 from mask.tools import Outline
 
-from mask.elements.electrical import Diode
+from mask.elements.electrical import Diode, Pixels2xN, Pixels4x4
 from mask.elements.meta import Wafer
 from mask.elements.meta import Mask
 from mask.elements.fabrication import MarkerCoarse, DeviceColumn
@@ -141,6 +141,39 @@ def main(args):
             DW, (outline.xMinAtY(TOP_DICING_Y), TOP_DICING_Y), (outline.xMaxAtY(TOP_DICING_Y), TOP_DICING_Y))
 
         top.add(diodes)
+
+
+        # Add multi pixel test structures
+
+        pixel2 = Pixels2xN(lib, 'PIXEL_2X2', 2, 500, 100);
+
+        top.add(gdspy.CellReference(pixel2.cell, origin=(0, TOP_DICING_Y+(pixel2.height-DW)*0.5)))
+        top.add(gdspy.CellReference(pixel2.cell, origin=(0, TOP_DICING_Y+(pixel2.height-DW)*1.5)))
+        top.add(gdspy.CellReference(pixel2.cell, origin=(0, TOP_DICING_Y+(pixel2.height-DW)*2.5)))
+
+
+        pixel4x4_large = Pixels4x4(lib, 'PIXEL_4X4_LARGE', 1000, 200, contactsize=1000)
+
+        x_offset = (pixel2.width + pixel4x4_large.width - 2*DW)*0.5
+        top.add(gdspy.CellReference(pixel4x4_large.cell, origin=(-x_offset, TOP_DICING_Y+(pixel4x4_large.height-DW)*0.5)))
+        top.add(gdspy.CellReference(pixel4x4_large.cell, origin=(+x_offset, TOP_DICING_Y+(pixel4x4_large.height-DW)*0.5)))
+
+
+        pixel15 = Pixels2xN(lib, 'PIXEL_2X15', 15, 500, 100);
+
+
+        x_offset += (pixel4x4_large.width + pixel15.height - 2*DW)*0.5
+        top.add(gdspy.CellReference(pixel15.cell, rotation=90, origin=(-x_offset, TOP_DICING_Y+(pixel15.width-DW)*0.5)))
+        top.add(gdspy.CellReference(pixel15.cell, rotation=90, origin=(+x_offset, TOP_DICING_Y+(pixel15.width-DW)*0.5)))
+
+
+        pixel4x4 = Pixels4x4(lib, 'PIXEL_4X4', 500, 100)
+
+        x_offset += (pixel15.height + pixel4x4.width - 2*DW)*0.5
+        top.add(gdspy.CellReference(pixel4x4.cell, origin=(-x_offset, TOP_DICING_Y+(pixel4x4.height-DW)*0.5)))
+        top.add(gdspy.CellReference(pixel4x4.cell, origin=(+x_offset, TOP_DICING_Y+(pixel4x4.height-DW)*0.5)))
+        top.add(gdspy.CellReference(pixel4x4.cell, origin=(-x_offset, TOP_DICING_Y+(pixel4x4.height-DW)*1.5)))
+        top.add(gdspy.CellReference(pixel4x4.cell, origin=(+x_offset, TOP_DICING_Y+(pixel4x4.height-DW)*1.5)))
 
     else:
 
