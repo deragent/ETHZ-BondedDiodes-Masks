@@ -62,7 +62,7 @@ def main(args):
         ADD_LABEL = (args.side == 'N')
 
         margin = 150
-        dicingwidth = 100
+        DW = 100
 
         xoffset = margin
 
@@ -105,7 +105,7 @@ def main(args):
 
             column_r = DeviceColumn(diodes, 'COLUMN_R_%s'%(config[0]), generator,
                 x, ymin[ii], min(-1*ymin[ii], ymax),
-                margin=margin, dicingwidth=dicingwidth, keepout=keepouts)
+                margin=margin, dicingwidth=DW, keepout=keepouts)
 
             dicinglines.append(column_r.cell.get_bounding_box()[1][0])
 
@@ -113,7 +113,7 @@ def main(args):
 
             column_l = DeviceColumn(diodes, 'COLUMN_L_%s'%(config[0]), generator,
                 -1*x, ymin[ii], min(-1*ymin[ii], ymax),
-                margin=margin, dicingwidth=dicingwidth, keepout=keepouts)
+                margin=margin, dicingwidth=DW, keepout=keepouts)
 
             dicinglines.append(column_l.cell.get_bounding_box()[0][0])
 
@@ -128,17 +128,17 @@ def main(args):
                     ystart = TOP_DICING_Y
 
                 if pos != 0:
-                    pos = pos - math.copysign(dicingwidth/2, pos)
+                    pos = pos - math.copysign(DW/2, pos)
 
                 line = DicingLine(GC.GLOBAL["LAYERS"]["DICING"], diodes,
-                    dicingwidth, (pos, ystart), (pos, outline.yMinAtX(pos)))
+                    DW, (pos, ystart), (pos, outline.yMinAtX(pos)))
 
 
             xoffset += generator.width() + 2*margin
 
         # Horizontal dicing line to separate the top test structures
         top_dicing = DicingLine(GC.GLOBAL["LAYERS"]["DICING"], diodes,
-            dicingwidth, (outline.xMinAtY(TOP_DICING_Y), TOP_DICING_Y), (outline.xMaxAtY(TOP_DICING_Y), TOP_DICING_Y))
+            DW, (outline.xMinAtY(TOP_DICING_Y), TOP_DICING_Y), (outline.xMaxAtY(TOP_DICING_Y), TOP_DICING_Y))
 
         top.add(diodes)
 
