@@ -6,7 +6,7 @@ from ...forms import GuardRings
 
 class Diode(Element):
 
-    def __init__(self, parent, name, size, rounding=0, window=0, 
+    def __init__(self, parent, name, size, back = False, rounding=0, window=0,
         overhang=10, label=None, margin=150, dicingwidth=100,
         layers=None, lib=None, tolerance=40):
 
@@ -26,20 +26,31 @@ class Diode(Element):
 
         self.label = label
 
+        self.back = back
+
         self.margin = margin
         self.dicingwidth = dicingwidth
 
         super().__init__(parent, name, layers, lib)
 
     def construct(self):
-        self.__createDiode(self.layers["CONTACT_DOPING"], overhang = 0)
-        self.__createDiode(self.layers["METALIZATION"], overhang = -self.overhang, window = self.window, label = self.label)
-        self.__createGuardRings(self.layers["CONTACT_DOPING"], overhang = 0)
-        self.__createGuardRings(self.layers["METALIZATION"], overhang = -self.overhang)
+
+        if not self.back:
+            self.__createDiode(self.layers["CONTACT_DOPING"], overhang = 0)
+            self.__createDiode(self.layers["METALIZATION"], overhang = -self.overhang, window = self.window, label = self.label)
+            self.__createGuardRings(self.layers["CONTACT_DOPING"], overhang = 0)
+            self.__createGuardRings(self.layers["METALIZATION"], overhang = -self.overhang)
+        else:
+            self.__createDiode(self.layers["CONTACT_DOPING"], overhang = 0)
+            self.__createDiode(self.layers["METALIZATION"], overhang = -self.overhang, window = self.window, label = self.label)
+
+
+        wA2 = self.A/2 + 650
+        wB2 = self.B/2 + 650
 
         self.addBBoxDicing(
             self.dicingwidth, self.margin, "DICING",
-            None # TODO
+            [[-wA2, -wB2], [wA2, wB2]]
         )
 
     def __createDiode(self, layer, overhang = 0, window=None, label=None):
