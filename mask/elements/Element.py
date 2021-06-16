@@ -1,4 +1,5 @@
 import gdspy
+import numpy
 
 from .. import config
 
@@ -32,6 +33,8 @@ class Element():
             bbox = self.cell.get_bounding_box()
         if bbox is None:
             return
+
+        bbox = numpy.array(bbox)
 
         outer = gdspy.Rectangle(bbox[0] - margin - width/2, bbox[1] + margin + width/2, **self.layers["DICING"])
         inner = gdspy.Rectangle(bbox[0] - margin + width/2, bbox[1] + margin - width/2, **self.layers["DICING"])
