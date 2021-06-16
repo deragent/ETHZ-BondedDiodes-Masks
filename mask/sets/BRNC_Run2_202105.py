@@ -175,6 +175,14 @@ def main(args):
         top.add(gdspy.CellReference(pixel4x4.cell, origin=(-x_offset, TOP_DICING_Y+(pixel4x4.height-DW)*1.5)))
         top.add(gdspy.CellReference(pixel4x4.cell, origin=(+x_offset, TOP_DICING_Y+(pixel4x4.height-DW)*1.5)))
 
+
+        pixel4x4_small = Pixels4x4(lib, 'PIXEL_4X4_SMALL', 200, 50, contactsize=200, trench=20)
+
+        x_offset += (pixel4x4.height + pixel4x4_small.width - 2*DW)*0.5
+        for ii in range(4):
+            top.add(gdspy.CellReference(pixel4x4_small.cell, origin=(-x_offset, TOP_DICING_Y+(pixel4x4_small.height-DW)*(ii+0.5))))
+            top.add(gdspy.CellReference(pixel4x4_small.cell, origin=(+x_offset, TOP_DICING_Y+(pixel4x4_small.height-DW)*(ii+0.5))))
+
     else:
 
         # Create the flood backside doping and metalization
