@@ -51,154 +51,141 @@ def main(args):
     wafer_markers = BRNC_202105.createWaferAlignment(lib)
     top.add(wafer_markers)
 
+    ### Create diode cells
+    diodes = lib.new_cell('DIODES')
 
-    if args.side != 'P':
+    LABEL_HEIGHT = 300
 
-        ### Create diode cells
-        diodes = lib.new_cell('DIODES')
+    ADD_LABEL = (args.side == 'N')
 
-        LABEL_HEIGHT = 300
+    MARGIN = 150
+    DW = 100
 
-        ADD_LABEL = (args.side == 'N')
+    BACK = args.side=='P'
 
-        MARGIN = 150
-        DW = 100
+    xoffset = -DW/2
 
-        xoffset = -DW/2
+    ymin = [-43000, -40000, -35000, -29500, -24000]
+    ymax = 29000
 
-        ymin = [-43000, -40000, -35000, -29500, -24000]
-        ymax = 29000
+    DIODE_CONFIGS = [
+        ['DIODE_12mm', 12000, 3000, 'B'],
+        ['DIODE_8mm', 8000, 2000, 'C'],
+        ['DIODE_6mm', 6000, 2000, 'D'],
+        ['DIODE_4mm', 4000, 1000, 'E'],
+        ['DIODE_2mm', 2000, 1000, 'F'],
+    ]
 
-        DIODE_CONFIGS = [
-            ['DIODE_12mm', 12000, 3000, 'B'],
-            ['DIODE_8mm', 8000, 2000, 'C'],
-            ['DIODE_6mm', 6000, 2000, 'D'],
-            ['DIODE_4mm', 4000, 1000, 'E'],
-            ['DIODE_2mm', 2000, 1000, 'F'],
-        ]
+    TOP_DICING_Y = 29000
 
-        TOP_DICING_Y = 29000
+    for ii, config in enumerate(DIODE_CONFIGS):
 
-        for ii, config in enumerate(DIODE_CONFIGS):
+        def createDiode(count, index):
+            if ADD_LABEL:
+                label = (config[3] + str(count), LABEL_HEIGHT)
+            else:
+                label = None
 
-            def createDiode(count, index):
-                if ADD_LABEL:
-                    label = (config[3] + str(count), LABEL_HEIGHT)
-                else:
-                    label = None
+            name = config[0] + '_%i'%(count)
+            window = config[2] if (index % 3) == 2 else 0
 
-                name = config[0] + '_%i'%(count)
-                window = config[2] if (index % 3) == 2 else 0
+            element = Diode(None, name, config[1], back=BACK,
+                            rounding=(config[1]/10), window=window,
+                            label=label, dicingwidth=DW, margin=MARGIN)
 
-                element = Diode(None, name, config[1],
-                                rounding=(config[1]/10), window=window,
-                                label=label, dicingwidth=DW, margin=MARGIN)
+            return element.cell
 
-                return element.cell
-
-            generator = CallbackGenerator(createDiode)
-
-
-            x = xoffset + generator.width()/2
-
-            dicinglines = [0]
-
-            column_r = DeviceColumn(diodes, 'COLUMN_R_%s'%(config[0]), generator,
-                x, ymin[ii], min(-1*ymin[ii], ymax),
-                margin=MARGIN, dicingwidth=DW, keepout=keepouts)
-
-            dicinglines.append(column_r.cell.get_bounding_box()[1][0])
-
-            generator.reset()
-
-            column_l = DeviceColumn(diodes, 'COLUMN_L_%s'%(config[0]), generator,
-                -1*x, ymin[ii], min(-1*ymin[ii], ymax),
-                margin=MARGIN, dicingwidth=DW, keepout=keepouts)
-
-            dicinglines.append(column_l.cell.get_bounding_box()[0][0])
+        generator = CallbackGenerator(createDiode)
 
 
-            generator.addCellsToLib(lib)
+        x = xoffset + generator.width()/2
+
+        dicinglines = [0]
+
+        column_r = DeviceColumn(diodes, 'COLUMN_R_%s'%(config[0]), generator,
+            x, ymin[ii], min(-1*ymin[ii], ymax),
+            margin=MARGIN, dicingwidth=DW, keepout=keepouts)
+
+        dicinglines.append(column_r.cell.get_bounding_box()[1][0])
+
+        generator.reset()
+
+        column_l = DeviceColumn(diodes, 'COLUMN_L_%s'%(config[0]), generator,
+            -1*x, ymin[ii], min(-1*ymin[ii], ymax),
+            margin=MARGIN, dicingwidth=DW, keepout=keepouts)
+
+        dicinglines.append(column_l.cell.get_bounding_box()[0][0])
 
 
-            # Add vertical dicing lines from the wafer edge
-            for pos in dicinglines:
-                ystart = outline.yMaxAtX(pos)
-                if ystart > TOP_DICING_Y:
-                    ystart = TOP_DICING_Y
-
-                if pos != 0:
-                    pos = pos - math.copysign(DW/2, pos)
-
-                line = DicingLine(GC.GLOBAL["LAYERS"]["DICING"], diodes,
-                    DW, (pos, ystart), (pos, outline.yMinAtX(pos)))
+        generator.addCellsToLib(lib)
 
 
-            xoffset += generator.width() - DW
+        # Add vertical dicing lines from the wafer edge
+        for pos in dicinglines:
+            ystart = outline.yMaxAtX(pos)
+            if ystart > TOP_DICING_Y:
+                ystart = TOP_DICING_Y
 
-        # Horizontal dicing line to separate the top test structures
-        top_dicing = DicingLine(GC.GLOBAL["LAYERS"]["DICING"], diodes,
-            DW, (outline.xMinAtY(TOP_DICING_Y), TOP_DICING_Y), (outline.xMaxAtY(TOP_DICING_Y), TOP_DICING_Y))
+            if pos != 0:
+                pos = pos - math.copysign(DW/2, pos)
 
-        top.add(diodes)
-
-
-
-        # Add multi pixel test structures
-
-        pixel2 = Pixels2xN(lib, 'PIXEL_2X2', 2, 500, 100,
-            dicingwidth=DW, margin=MARGIN);
-
-        top.add(gdspy.CellReference(pixel2.cell, origin=(0, TOP_DICING_Y+(pixel2.height-DW)*0.5)))
-        top.add(gdspy.CellReference(pixel2.cell, origin=(0, TOP_DICING_Y+(pixel2.height-DW)*1.5)))
-        top.add(gdspy.CellReference(pixel2.cell, origin=(0, TOP_DICING_Y+(pixel2.height-DW)*2.5)))
+            line = DicingLine(GC.GLOBAL["LAYERS"]["DICING"], diodes,
+                DW, (pos, ystart), (pos, outline.yMinAtX(pos)))
 
 
-        pixel4x4_large = Pixels4x4(lib, 'PIXEL_4X4_LARGE', 1000, 200, contactsize=1000)
+        xoffset += generator.width() - DW
 
-        x_offset = (pixel2.width + pixel4x4_large.width - 2*DW)*0.5
-        top.add(gdspy.CellReference(pixel4x4_large.cell, origin=(-x_offset, TOP_DICING_Y+(pixel4x4_large.height-DW)*0.5)))
-        top.add(gdspy.CellReference(pixel4x4_large.cell, origin=(+x_offset, TOP_DICING_Y+(pixel4x4_large.height-DW)*0.5)))
+    # Horizontal dicing line to separate the top test structures
+    top_dicing = DicingLine(GC.GLOBAL["LAYERS"]["DICING"], diodes,
+        DW, (outline.xMinAtY(TOP_DICING_Y), TOP_DICING_Y), (outline.xMaxAtY(TOP_DICING_Y), TOP_DICING_Y))
 
-
-        pixel15 = Pixels2xN(lib, 'PIXEL_2X15', 15, 500, 100,
-            dicingwidth=DW, margin=MARGIN);
+    top.add(diodes)
 
 
-        x_offset += (pixel4x4_large.width + pixel15.height - 2*DW)*0.5
-        top.add(gdspy.CellReference(pixel15.cell, rotation=90, origin=(-x_offset, TOP_DICING_Y+(pixel15.width-DW)*0.5)))
-        top.add(gdspy.CellReference(pixel15.cell, rotation=90, origin=(+x_offset, TOP_DICING_Y+(pixel15.width-DW)*0.5)))
+
+    # Add multi pixel test structures
+
+    pixel2 = Pixels2xN(lib, 'PIXEL_2X2', 2, 500, 100,
+        dicingwidth=DW, margin=MARGIN, back=BACK)
+
+    top.add(gdspy.CellReference(pixel2.cell, origin=(0, TOP_DICING_Y+(pixel2.height-DW)*0.5)))
+    top.add(gdspy.CellReference(pixel2.cell, origin=(0, TOP_DICING_Y+(pixel2.height-DW)*1.5)))
+    top.add(gdspy.CellReference(pixel2.cell, origin=(0, TOP_DICING_Y+(pixel2.height-DW)*2.5)))
 
 
-        pixel4x4 = Pixels4x4(lib, 'PIXEL_4X4', 500, 100)
+    pixel4x4_large = Pixels4x4(lib, 'PIXEL_4X4_LARGE', 1000, 200, contactsize=1000, back=BACK)
 
-        x_offset += (pixel15.height + pixel4x4.width - 2*DW)*0.5
-        top.add(gdspy.CellReference(pixel4x4.cell, origin=(-x_offset, TOP_DICING_Y+(pixel4x4.height-DW)*0.5)))
-        top.add(gdspy.CellReference(pixel4x4.cell, origin=(+x_offset, TOP_DICING_Y+(pixel4x4.height-DW)*0.5)))
-        top.add(gdspy.CellReference(pixel4x4.cell, origin=(-x_offset, TOP_DICING_Y+(pixel4x4.height-DW)*1.5)))
-        top.add(gdspy.CellReference(pixel4x4.cell, origin=(+x_offset, TOP_DICING_Y+(pixel4x4.height-DW)*1.5)))
+    x_offset = (pixel2.width + pixel4x4_large.width - 2*DW)*0.5
+    top.add(gdspy.CellReference(pixel4x4_large.cell, origin=(-x_offset, TOP_DICING_Y+(pixel4x4_large.height-DW)*0.5)))
+    top.add(gdspy.CellReference(pixel4x4_large.cell, origin=(+x_offset, TOP_DICING_Y+(pixel4x4_large.height-DW)*0.5)))
 
 
-        pixel4x4_small = Pixels4x4(lib, 'PIXEL_4X4_SMALL', 200, 50, contactsize=200, trench=20)
+    pixel15 = Pixels2xN(lib, 'PIXEL_2X15', 15, 500, 100,
+        dicingwidth=DW, margin=MARGIN, back=BACK)
 
-        x_offset += (pixel4x4.height + pixel4x4_small.width - 2*DW)*0.5
-        for ii in range(4):
-            top.add(gdspy.CellReference(pixel4x4_small.cell, origin=(-x_offset, TOP_DICING_Y+(pixel4x4_small.height-DW)*(ii+0.5))))
-            top.add(gdspy.CellReference(pixel4x4_small.cell, origin=(+x_offset, TOP_DICING_Y+(pixel4x4_small.height-DW)*(ii+0.5))))
+    x_offset += (pixel4x4_large.width + pixel15.height - 2*DW)*0.5
+    top.add(gdspy.CellReference(pixel15.cell, rotation=90, origin=(-x_offset, TOP_DICING_Y+(pixel15.width-DW)*0.5)))
+    top.add(gdspy.CellReference(pixel15.cell, rotation=90, origin=(+x_offset, TOP_DICING_Y+(pixel15.width-DW)*0.5)))
 
-    else:
 
-        # Create the flood backside doping and metalization
-        backside = lib.new_cell('BACKSIDE')
+    pixel4x4 = Pixels4x4(lib, 'PIXEL_4X4', 500, 100, back=BACK)
 
-        for layer_name in ["CONTACT_DOPING", "METALIZATION"]:
-            flood = Flood(
-                GC.GLOBAL["LAYERS"][layer_name], backside,
-                (-59000, -63000), (+59000, +50500),
-                radius=90000/2 , keepout=keepouts
-            )
+    x_offset += (pixel15.height + pixel4x4.width - 2*DW)*0.5
+    top.add(gdspy.CellReference(pixel4x4.cell, origin=(-x_offset, TOP_DICING_Y+(pixel4x4.height-DW)*0.5)))
+    top.add(gdspy.CellReference(pixel4x4.cell, origin=(+x_offset, TOP_DICING_Y+(pixel4x4.height-DW)*0.5)))
+    top.add(gdspy.CellReference(pixel4x4.cell, origin=(-x_offset, TOP_DICING_Y+(pixel4x4.height-DW)*1.5)))
+    top.add(gdspy.CellReference(pixel4x4.cell, origin=(+x_offset, TOP_DICING_Y+(pixel4x4.height-DW)*1.5)))
 
-        top.add(backside)
+
+    pixel4x4_small = Pixels4x4(lib, 'PIXEL_4X4_SMALL', 200, 50, contactsize=200, trench=20, back=BACK)
+
+    x_offset += (pixel4x4.height + pixel4x4_small.width - 2*DW)*0.5
+    for ii in range(4):
+        top.add(gdspy.CellReference(pixel4x4_small.cell, origin=(-x_offset, TOP_DICING_Y+(pixel4x4_small.height-DW)*(ii+0.5))))
+        top.add(gdspy.CellReference(pixel4x4_small.cell, origin=(+x_offset, TOP_DICING_Y+(pixel4x4_small.height-DW)*(ii+0.5))))
+
+
+
 
     ## Add test structures (VPD + TLM)
     testset_vert, testset_hor = Run2_TestSet(lib)
