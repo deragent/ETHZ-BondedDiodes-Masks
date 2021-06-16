@@ -8,7 +8,7 @@ class Pixels4x4(Element):
     def __init__(self, parent, name,
         size, implantsize,
         contactsize=400, trench=50, overhang=10,
-        dicingwidth=100,
+        margin=150, dicingwidth=100,
         layers=None, lib=None):
 
         self.size = size
@@ -17,6 +17,7 @@ class Pixels4x4(Element):
         self.trench = trench
 
         self.overhang = overhang
+        self.margin = margin
         self.dicingwidth = dicingwidth
 
         super().__init__(parent, name, layers, lib)
@@ -62,16 +63,12 @@ class Pixels4x4(Element):
 
             y += s + ts
 
-
-        # Define the dicing lines
         dw = tw + 2.5*c
 
-        outer = gdspy.Rectangle((-dw/2 - 3*d, -dw/2 - 3*d), (dw/2 + 3*d, dw/2 + 3*d), **self.layers["DICING"])
-        inner = gdspy.Rectangle((-dw/2 - 2*d, -dw/2 - 2*d), (dw/2 + 2*d, dw/2 + 2*d), **self.layers["DICING"])
-
-        dicing = gdspy.boolean(outer, inner, 'not', **self.layers["DICING"])
-
-        self.cell.add(dicing)
+        self.addBBoxDicing(
+            self.dicingwidth, self.margin, "DICING",
+            [[-dw/2, -dw/2], [dw/2, dw/2]]
+        )
 
 
     def __createInnerPixel(self, x, y, left=True, up=True):

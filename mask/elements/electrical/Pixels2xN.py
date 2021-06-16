@@ -8,7 +8,7 @@ class Pixels2xN(Element):
     def __init__(self, parent, name,
         N, size, implantsize,
         contactsize=400, trench=50, overhang=10,
-        dicingwidth=100,
+        margin=150, dicingwidth=100,
         layers=None, lib=None):
 
         self.N = N
@@ -18,6 +18,7 @@ class Pixels2xN(Element):
         self.trench = trench
 
         self.overhang = overhang
+        self.margin = margin
         self.dicingwidth = dicingwidth
 
         super().__init__(parent, name, layers, lib)
@@ -41,14 +42,10 @@ class Pixels2xN(Element):
 
             x += s + t
 
-
-        # Define the dicing lines
-        outer = gdspy.Rectangle((-tw/2 - 3*d, -th/2 - 3*d), (tw/2 + 3*d, th/2 + 3*d), **self.layers["DICING"])
-        inner = gdspy.Rectangle((-tw/2 - 2*d, -th/2 - 2*d), (tw/2 + 2*d, th/2 + 2*d), **self.layers["DICING"])
-
-        dicing = gdspy.boolean(outer, inner, 'not', **self.layers["DICING"])
-
-        self.cell.add(dicing)
+        self.addBBoxDicing(
+            self.dicingwidth, self.margin, "DICING",
+            [[-tw/2, -th/2], [tw/2, th/2]]
+        )
 
 
     def __createPixel(self, x, y, up=True):
