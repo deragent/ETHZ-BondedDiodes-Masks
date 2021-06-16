@@ -64,7 +64,7 @@ class Pixels4x4(Element):
 
 
         # Define the dicing lines
-        dw = tw + 3*c
+        dw = tw + 2.5*c
 
         outer = gdspy.Rectangle((-dw/2 - 3*d, -dw/2 - 3*d), (dw/2 + 3*d, dw/2 + 3*d), **self.layers["DICING"])
         inner = gdspy.Rectangle((-dw/2 - 2*d, -dw/2 - 2*d), (dw/2 + 2*d, dw/2 + 2*d), **self.layers["DICING"])
