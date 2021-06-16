@@ -22,7 +22,7 @@ class DeviceColumn(Element):
 
     def construct(self):
 
-        m = self.margin
+        dw = self.dicingwidth
 
         bbox = self.generator.bbox()
 
@@ -33,9 +33,7 @@ class DeviceColumn(Element):
         # column are symmetric around X=0 and Y=0. This is not always the case.
         # To be fixed in the future!
 
-        doffset = devw / 2 + m
-
-        origin = (self.x, self.ymin + m + devh/2)
+        origin = (self.x, self.ymin + devh/2)
 
         ymax = 0
 
@@ -52,7 +50,7 @@ class DeviceColumn(Element):
 
             collision = self.__inKeepout(ref.get_bounding_box())
             if collision is not None:
-                origin = (origin[0], origin[1] + collision + 3*m)
+                origin = (origin[0], origin[1] + collision + dw)
                 self.generator.retract()
                 continue
 
@@ -60,25 +58,11 @@ class DeviceColumn(Element):
             ref_ymax = ref.get_bounding_box()[1,1]
             self.cell.add(ref)
 
-            ## Add top and bottom dicing line
-            dicing_bottom = DicingLine(self.layers["DICING"], self.cell,
-                self.dicingwidth, (self.x - doffset, ref_ymin - m), (self.x + doffset, ref_ymin - m))
-            dicing_top = DicingLine(self.layers["DICING"], self.cell,
-                self.dicingwidth, (self.x - doffset, ref_ymax + m), (self.x + doffset, ref_ymax + m))
-
             ## TODO fix proper detection for top and bottom end of vertical dicing lines
             ymax = ref_ymax
 
 
-            origin = (origin[0], origin[1] + devh + 2*m)
-
-
-        ## Add left and right dicing line
-        dicing_left = DicingLine(self.layers["DICING"], self.cell,
-            self.dicingwidth, (self.x - doffset, self.ymin), (self.x - doffset, ymax + m))
-        dicing_right = DicingLine(self.layers["DICING"], self.cell,
-            self.dicingwidth, (self.x + doffset, self.ymin), (self.x + doffset, ymax + m))
-
+            origin = (origin[0], origin[1] + devh - dw)
 
 
     def __inKeepout(self, bbox):

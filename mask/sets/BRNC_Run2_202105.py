@@ -61,10 +61,10 @@ def main(args):
 
         ADD_LABEL = (args.side == 'N')
 
-        margin = 150
+        MARGIN = 150
         DW = 100
 
-        xoffset = margin
+        xoffset = -DW/2
 
         ymin = [-43000, -40000, -35000, -29500, -24000]
         ymax = 29000
@@ -92,7 +92,7 @@ def main(args):
 
                 element = Diode(None, name, config[1],
                                 rounding=(config[1]/10), window=window,
-                                label=label)
+                                label=label, dicingwidth=DW, margin=MARGIN)
 
                 return element.cell
 
@@ -105,7 +105,7 @@ def main(args):
 
             column_r = DeviceColumn(diodes, 'COLUMN_R_%s'%(config[0]), generator,
                 x, ymin[ii], min(-1*ymin[ii], ymax),
-                margin=margin, dicingwidth=DW, keepout=keepouts)
+                margin=MARGIN, dicingwidth=DW, keepout=keepouts)
 
             dicinglines.append(column_r.cell.get_bounding_box()[1][0])
 
@@ -113,7 +113,7 @@ def main(args):
 
             column_l = DeviceColumn(diodes, 'COLUMN_L_%s'%(config[0]), generator,
                 -1*x, ymin[ii], min(-1*ymin[ii], ymax),
-                margin=margin, dicingwidth=DW, keepout=keepouts)
+                margin=MARGIN, dicingwidth=DW, keepout=keepouts)
 
             dicinglines.append(column_l.cell.get_bounding_box()[0][0])
 
@@ -134,7 +134,7 @@ def main(args):
                     DW, (pos, ystart), (pos, outline.yMinAtX(pos)))
 
 
-            xoffset += generator.width() + 2*margin
+            xoffset += generator.width() - DW
 
         # Horizontal dicing line to separate the top test structures
         top_dicing = DicingLine(GC.GLOBAL["LAYERS"]["DICING"], diodes,
@@ -143,9 +143,11 @@ def main(args):
         top.add(diodes)
 
 
+
         # Add multi pixel test structures
 
-        pixel2 = Pixels2xN(lib, 'PIXEL_2X2', 2, 500, 100);
+        pixel2 = Pixels2xN(lib, 'PIXEL_2X2', 2, 500, 100,
+            dicingwidth=DW, margin=MARGIN);
 
         top.add(gdspy.CellReference(pixel2.cell, origin=(0, TOP_DICING_Y+(pixel2.height-DW)*0.5)))
         top.add(gdspy.CellReference(pixel2.cell, origin=(0, TOP_DICING_Y+(pixel2.height-DW)*1.5)))
@@ -159,7 +161,8 @@ def main(args):
         top.add(gdspy.CellReference(pixel4x4_large.cell, origin=(+x_offset, TOP_DICING_Y+(pixel4x4_large.height-DW)*0.5)))
 
 
-        pixel15 = Pixels2xN(lib, 'PIXEL_2X15', 15, 500, 100);
+        pixel15 = Pixels2xN(lib, 'PIXEL_2X15', 15, 500, 100,
+            dicingwidth=DW, margin=MARGIN);
 
 
         x_offset += (pixel4x4_large.width + pixel15.height - 2*DW)*0.5
