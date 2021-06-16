@@ -26,6 +26,20 @@ class Element():
     def construct(self):
         raise NotImplementedError()
 
+    def addBBoxDicing(self, width, margin, layer, bbox = None):
+
+        if bbox is None:
+            bbox = self.cell.get_bounding_box()
+        if bbox is None:
+            return
+
+        outer = gdspy.Rectangle(bbox[0] - margin - width/2, bbox[1] + margin + width/2, **self.layers["DICING"])
+        inner = gdspy.Rectangle(bbox[0] - margin + width/2, bbox[1] + margin - width/2, **self.layers["DICING"])
+
+        dicing = gdspy.boolean(outer, inner, 'not', **self.layers["DICING"])
+
+        self.cell.add(dicing)
+
     def _finalize(self):
 
         bbox = self.cell.get_bounding_box()
