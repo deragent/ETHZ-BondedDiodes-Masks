@@ -8,7 +8,7 @@ class Pixels2xN(Element):
     def __init__(self, parent, name,
         N, size, implantsize,
         contactsize=400, trench=50, overhang=10,
-        margin=150, dicingwidth=100,
+        back=False, margin=150, dicingwidth=100,
         layers=None, lib=None):
 
         self.N = N
@@ -21,6 +21,8 @@ class Pixels2xN(Element):
         self.margin = margin
         self.dicingwidth = dicingwidth
 
+        self.back = back
+
         super().__init__(parent, name, layers, lib)
 
     def construct(self):
@@ -30,17 +32,31 @@ class Pixels2xN(Element):
         c = self.contactsize
         N = self.N
         d = self.dicingwidth
+        oh = self.overhang
 
         tw = N*s + (N+1)*t
         th = 2*(s*1.5+c) + d
 
-        # Add all pixels
-        x = -tw/2 + t + s/2
-        for nn in range(N):
-            self.__createPixel(x, (s+t)/2, True)
-            self.__createPixel(x, -(s+t)/2, False)
+        if not self.back:
+            # Add all pixels
+            x = -tw/2 + t + s/2
+            for nn in range(N):
+                self.__createPixel(x, (s+t)/2, True)
+                self.__createPixel(x, -(s+t)/2, False)
 
-            x += s + t
+                x += s + t
+
+        else:
+            bh = 2*s + t
+
+            self.cell.add(gdspy.Rectangle(
+                (-tw/2, -bh/2), (tw/2, bh/2),
+                **self.layers["CONTACT_DOPING"]
+            ))
+            self.cell.add(gdspy.Rectangle(
+                (-tw/2+oh, -bh/2+oh), (tw/2-oh, bh/2-oh),
+                **self.layers["METALIZATION"]
+            ))
 
         self.addBBoxDicing(
             self.dicingwidth, self.margin, "DICING",

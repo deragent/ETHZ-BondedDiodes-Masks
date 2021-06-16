@@ -8,7 +8,7 @@ class Pixels4x4(Element):
     def __init__(self, parent, name,
         size, implantsize,
         contactsize=400, trench=50, overhang=10,
-        margin=150, dicingwidth=100,
+        back=False, margin=150, dicingwidth=100,
         layers=None, lib=None):
 
         self.size = size
@@ -20,6 +20,8 @@ class Pixels4x4(Element):
         self.margin = margin
         self.dicingwidth = dicingwidth
 
+        self.back = back
+
         super().__init__(parent, name, layers, lib)
 
     def construct(self):
@@ -28,6 +30,7 @@ class Pixels4x4(Element):
         s = self.size
         c = self.contactsize
         d = self.dicingwidth
+        oh = self.overhang
 
         w = self.contactsize/10
 
@@ -35,36 +38,47 @@ class Pixels4x4(Element):
 
         tw = 4*s + (4+1)*ts
 
-        # Add all pixels
-        y = -tw/2 + ts + s/2
+        if not self.back:
+            # Add all pixels
+            y = -tw/2 + ts + s/2
 
-        for yy in range(4):
-            x = -tw/2 + ts + s/2
+            for yy in range(4):
+                x = -tw/2 + ts + s/2
 
-            for xx in range(4):
-                inner = False
-                if yy == 0:
-                    orientation = math.pi
-                elif yy == 3:
-                    orientation = 0
-                elif xx == 0:
-                    orientation = math.pi/2
-                elif xx == 3:
-                    orientation = -math.pi/2
-                else:
-                    inner = True
+                for xx in range(4):
+                    inner = False
+                    if yy == 0:
+                        orientation = math.pi
+                    elif yy == 3:
+                        orientation = 0
+                    elif xx == 0:
+                        orientation = math.pi/2
+                    elif xx == 3:
+                        orientation = -math.pi/2
+                    else:
+                        inner = True
 
-                if not inner:
-                    self.__createOuterPixel(x, y, orientation)
-                else:
-                    self.__createInnerPixel(x, y, left=xx<2, up=yy<2)
+                    if not inner:
+                        self.__createOuterPixel(x, y, orientation)
+                    else:
+                        self.__createInnerPixel(x, y, left=xx<2, up=yy<2)
 
-                x += s + ts
+                    x += s + ts
 
-            y += s + ts
+                y += s + ts
+
+
+        else:
+            self.cell.add(gdspy.Rectangle(
+                (-tw/2, -tw/2), (tw/2, tw/2),
+                **self.layers["CONTACT_DOPING"]
+            ))
+            self.cell.add(gdspy.Rectangle(
+                (-tw/2+oh, -tw/2+oh), (tw/2-oh, tw/2-oh),
+                **self.layers["METALIZATION"]
+            ))
 
         dw = tw + 2.5*c
-
         self.addBBoxDicing(
             self.dicingwidth, self.margin, "DICING",
             [[-dw/2, -dw/2], [dw/2, dw/2]]
