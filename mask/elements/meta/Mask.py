@@ -79,7 +79,7 @@ class Mask(Element):
         label = TextList(self.layers["MASK_LABEL"], textcell,
             self.text, height=self.textheight, origin=(x0, y0))
 
-        self.cell.add(textcell)
+        self.cell.add(gdspy.CellReference(textcell))
 
     def setMaskName(self, name):
 

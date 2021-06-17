@@ -67,8 +67,9 @@ class ReferenceGenerator(Generator):
 
 class CallbackGenerator(Generator):
 
-    def __init__(self, callback):
+    def __init__(self, lib, callback):
         self.callback = callback
+        self.lib = lib
 
         self.count = 0
 
@@ -87,7 +88,7 @@ class CallbackGenerator(Generator):
         return bbox
 
     def instance(self):
-        cell = self.callback(self.count, self.index)
+        cell = self.callback(self.lib, self.count, self.index)
         ref = gdspy.CellReference(cell)
 
         self.cells.append(cell)
@@ -101,8 +102,9 @@ class CallbackGenerator(Generator):
         self.index -= 1
         self.count -= 1
 
-        self.cells.pop()
+        cell = self.cells.pop()
+        self.lib.remove(cell)
 
-    def addCellsToLib(self, lib):
+    def addCellsToParent(self, parent):
         for cell in self.cells:
-            lib.add(cell)
+            parent.add(cell)
