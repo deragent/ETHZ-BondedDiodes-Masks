@@ -136,7 +136,9 @@ def main(args):
     top_dicing = DicingLine(GC.GLOBAL["LAYERS"]["DICING"], diodes,
         DW, (outline.xMinAtY(TOP_DICING_Y), TOP_DICING_Y), (outline.xMaxAtY(TOP_DICING_Y), TOP_DICING_Y))
 
-    top.add(gdspy.CellReference(diodes))
+    top.add(gdspy.CellReference(diodes,
+        x_reflection=BACK, rotation=(180 if BACK else 0)
+    ))
 
 
 
@@ -183,7 +185,9 @@ def main(args):
         pixels.add(gdspy.CellReference(pixel4x4_small.cell, origin=(+x_offset, TOP_DICING_Y+(pixel4x4_small.height-DW)*(ii+0.5))))
 
 
-    top.add(gdspy.CellReference(pixels))
+    top.add(gdspy.CellReference(pixels,
+        x_reflection=BACK, rotation=(180 if BACK else 0)
+    ))
 
 
     ## Add test structures (VPD + TLM)
