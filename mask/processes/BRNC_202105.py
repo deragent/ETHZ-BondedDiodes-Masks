@@ -57,11 +57,15 @@ def createMarkers(lib):
 
     markers = lib.new_cell('MARKERS')
 
+    # The positions are hard-coded here, as the alignment mark mask has been
+    # written before finalizing the design. As the METALIZATION and
+    # ISOLATION_TRENCH marks have to be inverted, this lead to a shift in the
+    # location of the alignment marks!
     field = MarkerField(lib, 'MARKER_FIELD', [
         ('1', 'ALIGNMENT_MARKS', 'CONTACT_DOPING', 20, False, True),
-        ('2', 'ALIGNMENT_MARKS', 'METALIZATION', 20, False, False),
-        ('3', 'ALIGNMENT_MARKS', 'ISOLATION_TRENCH', 20, False, False),
-    ])
+        ('2', 'ALIGNMENT_MARKS', 'METALIZATION', 20, False, True),
+        ('3', 'ALIGNMENT_MARKS', 'ISOLATION_TRENCH', 20, False, True),
+    ], position=[0, 1640, 1640+1620])
 
 
     marker_left = gdspy.CellReference(field.cell, origin=(-42000, 0))
