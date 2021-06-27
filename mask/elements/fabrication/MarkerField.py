@@ -8,10 +8,15 @@ from ...forms import MarkerArrow
 
 class MarkerField(Element):
 
-    def __init__(self, parent, name, config, arrowsize=20, layers=None, lib=None):
+    def __init__(self, parent, name, config, position=None, arrowsize=20, layers=None, lib=None):
 
         self.config = config
         self.arrowsize = arrowsize
+
+        if position is None:
+            self.position = [None]*len(config)
+        else:
+            self.position = position
 
         super().__init__(parent, name, layers, lib)
 
@@ -20,16 +25,22 @@ class MarkerField(Element):
         offset = 0
         layers = []
 
-        for number, l1, l2, size, inv1, inv2 in self.config:
+        for cc, config in enumerate(self.config):
+
+            number, l1, l2, size, inv1, inv2 = config
 
             marker = MarkerCoarse(None, 'MARKER_%s_%s'%(l1, l2), number,
                 l1, l2, size=size,
                 inverted=(inv1, inv2),
                 layers=self.layers, lib=self.lib)
 
+            x = offset
+            if self.position[cc] is not None:
+                x = self.position[cc]
+
             self.cell.add(gdspy.CellReference(
                 marker.cell,
-                origin=(offset, 0)
+                origin=(x, 0)
             ))
 
             layers.extend([l1, l2])
