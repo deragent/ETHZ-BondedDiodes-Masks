@@ -67,8 +67,10 @@ class ReferenceGenerator(Generator):
 
 class CallbackGenerator(Generator):
 
-    def __init__(self, lib, callback):
+    def __init__(self, lib, callback, retract_callback=None):
         self.callback = callback
+        self.retract_callback = retract_callback
+
         self.lib = lib
 
         self.count = 0
@@ -101,6 +103,9 @@ class CallbackGenerator(Generator):
     def retract(self):
         self.index -= 1
         self.count -= 1
+
+        if self.retract_callback is not None:
+            self.retract_callback(self.lib, self.count, self.index)
 
         cell = self.cells.pop()
         self.lib.remove(cell)
