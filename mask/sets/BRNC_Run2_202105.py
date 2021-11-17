@@ -1,5 +1,6 @@
 import gdspy
 import math
+import os
 
 import numpy as np
 
@@ -20,6 +21,7 @@ from mask.elements.fabrication import MarkerCoarse, DeviceColumn
 from mask.forms import DicingLine, Flood
 from mask.elements import CallbackGenerator
 
+from mask.tools import PlotterLib
 
 
 def main(args):
@@ -224,6 +226,25 @@ def main(args):
     lib.write_gds(args.output)
     ### Save and svg representation
     top.write_svg(args.output + '.svg', 0.1)
+
+
+    ### Generate a matplotlib-plotter
+    plot_name = os.path.basename(args.output).replace(".gds", "")
+    plot_name = "Plotter" + plot_name.replace("_", "")
+    plotter = PlotterLib(plot_name, lib)
+
+    plotter.include("DIODE_.*_[0-9]+")
+    plotter.rename("DIODE_", "_")
+    plotter.rename("_2mm_", "F")
+    plotter.rename("_4mm_", "E")
+    plotter.rename("_6mm_", "D")
+    plotter.rename("_8mm_", "C")
+    plotter.rename("_12mm_", "B")
+
+    plotter.generate()
+    plot_file = os.path.split(args.output)[0]
+    plot_file = os.path.join(plot_file, plot_name + ".py")
+    plotter.write(plot_file)
 
     if args.export is not None:
         merge = MaskMerge(top)
