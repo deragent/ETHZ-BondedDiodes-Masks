@@ -60,6 +60,10 @@ class PlotterGenerator():
     def print(self):
         print(self)
 
+    def write(self, file):
+        with open(file, 'w') as f:
+            f.write(str(self))
+
     def __str__(self):
         if self.code is None:
             self.generate()

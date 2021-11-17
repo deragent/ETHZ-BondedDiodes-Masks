@@ -85,6 +85,7 @@ class PlotterLib(PlotterGenerator):
     def _transformBBox(self, t, bbox):
         result = np.zeros((2, 2))
 
+        # Transform each corner point of the bounding box
         for pp, point in enumerate(list(bbox)):
             old = np.ones((3, 1))
             old[0:2,0] = point
@@ -92,21 +93,17 @@ class PlotterLib(PlotterGenerator):
 
             result[pp, :] = new[0:2,0].T
 
-        print(result)
-
         return result
 
 
     def _traverse(self, cell, t):
 
+        # Treat / Export the current cell
         if self._match(cell.name):
-
             name = self._rename(cell.name)
-
-            print(name, " Origin (%i %i)"%(t[0,2], t[1, 2]))
-
             self.addBBox(name, self._transformBBox(t, cell.get_bounding_box()))
 
+        # Recurse into referenced sub-cells
         for ref in cell.references:
             nt = Transform(ref).t
 
