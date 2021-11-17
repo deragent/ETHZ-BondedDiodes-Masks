@@ -13,6 +13,7 @@ class BBoxElement():
         self.bbox = np.array(bbox)
 
     def path(self):
+        bbox = self.bbox
         codes = [Path.MOVETO] + [Path.LINETO]*3 + [Path.CLOSEPOLY]
         vertices = [bbox[0,:], (bbox[0,0], bbox[1,1]), bbox[1,:], (bbox[1,0], bbox[0,1]), (0,0)]
 
@@ -31,6 +32,15 @@ class %s():
         patch = PathPatch(self.ELEMENTS[dev].path(), **kwargs)
 
         self.ax.add_patch(patch)
+
+    def color(self, entries, norm=None, cmap=plt.cm.viridis):
+        values = np.array(list(entries.values()))
+
+        if norm is None:
+            norm = matplotlib.colors.Normalize(vmin=np.min(values), vmax=np.max(values))
+
+        for key, value in entries.items():
+            self.plot(key, fc=cmap(norm(value)))
 """
 
 BBOX_TEMPLATE = "\"%s\": BBoxElement(\"%s\", %s)"
