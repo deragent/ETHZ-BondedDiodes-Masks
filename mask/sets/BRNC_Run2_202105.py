@@ -21,7 +21,7 @@ from mask.elements.fabrication import MarkerCoarse, DeviceColumn
 from mask.forms import DicingLine, Flood
 from mask.elements import CallbackGenerator
 
-from mask.tools import PlotterLib
+from mask.tools import PlotterLib, LibIterator, Transform
 
 
 def main(args):
@@ -245,6 +245,52 @@ def main(args):
     plot_file = os.path.split(args.output)[0]
     plot_file = os.path.join(plot_file, plot_name + ".py")
     plotter.write(plot_file)
+
+    ### Export Diode Probe Site List
+    ## To be used as Subsites with Summit 12k probe station
+    class ProbeSiteExport(LibIterator):
+        def __init__(self):
+            super().__init__(lib)
+
+            self.include("DIODE_.*_[0-9]+")
+            self.rename("DIODE_", "_")
+            self.rename("_2mm_", "F")
+            self.rename("_4mm_", "E")
+            self.rename("_6mm_", "D")
+            self.rename("_8mm_", "C")
+            self.rename("_12mm_", "B")
+
+            self.offset = {
+                'B': np.array([-3000, 3000]),
+                'C': np.array([-2000, 2000]),
+                'D': np.array([-2000, 2000]),
+                'E': np.array([-1000, 1000]),
+                'F': np.array([-1000, 1000]),
+            }
+
+            self.positions = {}
+
+        def _exec(self, name, cell, t):
+            self.positions[name] = Transform.apply(t, [0,0])
+
+        def generate(self):
+            self.traverseAll()
+
+            ref = self.positions["B0"]
+
+            keys = list(self.positions.keys())
+            # Emulate some natural sort by 0 padding the diode number
+            keys.sort(key=lambda item: (item[0], '%5i'%(int(item[1:]))))
+
+            for key in keys:
+                # Offset to not probe into middle of TCT opening
+                pos = self.positions[key] - ref + self.offset[key[0]]
+                # TODO this is a hack so far and just prints to stdout!!!
+                print("%i, %i, %s"%(pos[0], pos[1], key))
+
+    ProbeSiteExport().generate()
+
+
 
     if args.export is not None:
         merge = MaskMerge(top)
