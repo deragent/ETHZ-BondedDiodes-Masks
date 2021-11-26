@@ -18,7 +18,7 @@ class PlotterLib(PlotterGenerator, LibIterator):
 
         # Transform each corner point of the bounding box
         for pp, point in enumerate(list(bbox)):
-            result[pp, :] = Transform.apply(t, point)
+            result[pp, :] = t.apply(point)
 
         return result
 

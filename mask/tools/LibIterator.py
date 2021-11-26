@@ -5,13 +5,6 @@ import numpy as np
 
 class Transform():
 
-    def apply(t, point):
-        old = np.ones((3, 1))
-        old[0:2,0] = point
-        new = t @ old
-
-        return new[0:2,0].T
-
     def identity():
         return np.diag((1,1,1))
 
@@ -38,19 +31,35 @@ class Transform():
         t[0:2,2] = np.array(origin)
         return t
 
-    def __init__(self, ref=None):
-        t = Transform.identity()
+    def __init__(self, ref=None, t=None):
+        if t is not None:
+            self.t = t
+        else:
+            t = Transform.identity()
 
-        if ref is not None:
-            if ref.magnification is not None:
-                t = Transform.magnify(self.magnification) @ t
-            if ref.x_reflection:
-                t = Transform.xref() @ t
-            if ref.rotation is not None:
-                t = Transform.rotate(np.radians(ref.rotation)) @ t
-            t = Transform.translate(ref.origin) @ t
+            if ref is not None:
+                if ref.magnification is not None:
+                    t = Transform.magnify(self.magnification) @ t
+                if ref.x_reflection:
+                    t = Transform.xref() @ t
+                if ref.rotation is not None:
+                    t = Transform.rotate(np.radians(ref.rotation)) @ t
+                t = Transform.translate(ref.origin) @ t
 
-        self.t = t
+            self.t = t
+
+    def __matmul__(self, other):
+        new_t = self.t @ other.t
+
+        return Transform(t=new_t)
+
+    def apply(self, point):
+        old = np.ones((3, 1))
+        old[0:2,0] = point
+        new = self.t @ old
+
+        return new[0:2,0].T
+
 
 
 class LibIterator():
@@ -94,11 +103,11 @@ class LibIterator():
 
         # Recurse into referenced sub-cells
         for ref in cell.references:
-            nt = Transform(ref).t
+            nt = Transform(ref)
 
             self._traverse(ref.ref_cell, t @ nt)
 
     def traverseAll(self):
 
         for top in self.lib.top_level():
-            self._traverse(top, Transform.identity())
+            self._traverse(top, Transform())

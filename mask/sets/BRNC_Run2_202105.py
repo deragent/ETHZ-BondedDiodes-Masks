@@ -271,7 +271,7 @@ def main(args):
             self.positions = {}
 
         def _exec(self, name, cell, t):
-            self.positions[name] = Transform.apply(t, [0,0])
+            self.positions[name] = t.apply([0,0])
 
         def generate(self):
             self.traverseAll()
