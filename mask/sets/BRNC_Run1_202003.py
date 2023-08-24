@@ -82,7 +82,7 @@ def main(args):
 
         for ii, config in enumerate(DIODE_CONFIGS):
 
-            def createDiode(count, index):
+            def createDiode(lib, count, index):
                 if ADD_LABEL:
                     label = (config[3] + str(count), LABEL_HEIGHT)
                 else:
@@ -91,13 +91,13 @@ def main(args):
                 name = config[0] + '_%i'%(count)
                 window = config[2] if (index % 3) == 2 else 0
 
-                element = Diode(None, name, config[1],
+                element = Diode(lib, name, config[1],
                                 rounding=(config[1]/10), window=window,
                                 label=label)
 
                 return element.cell
 
-            generator = CallbackGenerator(createDiode)
+            generator = CallbackGenerator(lib, createDiode)
 
 
             x = xoffset + generator.width()/2
@@ -121,7 +121,7 @@ def main(args):
             dicinglines.append(column_l.cell.get_bounding_box()[0][0])
 
 
-            generator.addCellsToLib(lib)
+            # generator.addCellsToLib(lib)
 
 
             # Add vertical dicing lines from the wafer edge
